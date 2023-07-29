@@ -1,5 +1,7 @@
 export type Connection = readonly [input: number, output: number]
 
+export type InnovationHistory = ReturnType<typeof createInnovationHistory>
+
 export const createInnovationHistory = () => {
 	// Track the number of innovations
 	let nextInnovationNumber = 0

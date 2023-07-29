@@ -14,7 +14,7 @@ test.each(Object.entries(sizes))("Empty genome has correct properties for size %
 
     const config = {...defaultConfig, ann}
 
-    const genome = createEmptyGenome(config, history)
+    const genome = createEmptyGenome(history, config)
 
     // Test basic properties of genome
 

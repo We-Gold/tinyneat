@@ -1,4 +1,5 @@
 import { modifiedSigmoid } from "./activations"
+import { uniformRandomWeight } from "./helpers"
 import { Connection } from "./history"
 
 export type ANNConnectionGene = {
@@ -78,7 +79,7 @@ export const createANN = (
 	return { process }
 }
 
-const createAdjacencyList = (genes: ANNConnectionGene[]) => {
+export const createAdjacencyList = (genes: ANNConnectionGene[]) => {
 	// Create lists to store input to output relationships and vice versa
 	const inputToOutput: { [key: number]: number[] } = {}
 	const outputToInput: { [key: number]: number[] } = {}
@@ -105,7 +106,7 @@ const createAdjacencyList = (genes: ANNConnectionGene[]) => {
 /**
  * Use Kahn's algorithm to topologically sort the nodes of the network.
  */
-const topologicalSort = (
+export const topologicalSort = (
 	inputToOutput: { [key: number]: number[] },
 	outputToInput: { [key: number]: number[] }
 ) => {
@@ -146,8 +147,16 @@ const topologicalSort = (
 		: []
 }
 
-// export const createConnection = (
-// 	connection: readonly [input: number, output: number],
-// 	config: typeof defaultConfig
-// ): ANNConnectionGene => {}
+export const calculateANNGeneDistance = (
+	gene1: ANNConnectionGene,
+	gene2: ANNConnectionGene
+) => {
+	return gene1.weight - gene2.weight
+}
 
+export const mutateANNGeneWeight = (
+	gene: ANNConnectionGene,
+	magnitude: number
+) => {
+	gene.weight += uniformRandomWeight(magnitude)
+}
