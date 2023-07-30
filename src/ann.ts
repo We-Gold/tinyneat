@@ -1,15 +1,12 @@
 import { modifiedSigmoid } from "./activations"
+import { ConnectionGene } from "./genome"
 import { uniformRandomWeight } from "./helpers"
-import { Connection } from "./history"
 
-export type ANNConnectionGene = {
-	connection: Connection
+export interface ANNConnectionGene extends ConnectionGene {
 	weight: number
-	enabled: boolean
-	innovationNumber: number
 }
 
-export const createANN = (
+export const createNetwork = (
 	inputSize: number,
 	outputSize: number,
 	genes: ANNConnectionGene[],
@@ -29,10 +26,11 @@ export const createANN = (
 	// Sort the graph to effectively linearize it
 	const topoSorted = topologicalSort(inputToOutput, outputToInput)
 
-	if (topoSorted.length === 0)
+	if (topoSorted.length === 0) {
 		throw new Error(
 			"Received an unexpected graph structure, make sure the ANN is configured correctly."
 		)
+	}
 
 	const process = (inputs: number[]) => {
 		// Verify that the input shape is correct
@@ -60,7 +58,7 @@ export const createANN = (
 			}
 		}
 
-		const outputs = Array(outputSize).fill(0)
+		const outputs: number[] = Array(outputSize).fill(0)
 
 		// Fill in all output values
 		for (let i = 0; i < nodeValues.length; i++) {
@@ -79,7 +77,7 @@ export const createANN = (
 	return { process }
 }
 
-export const createAdjacencyList = (genes: ANNConnectionGene[]) => {
+export const createAdjacencyList = (genes: ConnectionGene[]) => {
 	// Create lists to store input to output relationships and vice versa
 	const inputToOutput: { [key: number]: number[] } = {}
 	const outputToInput: { [key: number]: number[] } = {}
@@ -110,10 +108,17 @@ export const topologicalSort = (
 	inputToOutput: { [key: number]: number[] },
 	outputToInput: { [key: number]: number[] }
 ) => {
+	// Current problem: the output index is 16, but indegrees skips an input so it doesn't go up to 16
+
 	// Store the number of connections into each node
-	const inDegrees = Object.values(outputToInput).map(
-		(neighbors) => neighbors.length
-	)
+	// const inDegrees = Object.values(outputToInput).map(
+	// 	(neighbors) => neighbors.length
+	// )
+	const inDegrees: { [key: number]: number } = {}
+
+	for (const [key, value] of Object.entries(outputToInput)) {
+		inDegrees[parseInt(key)] = value.length
+	}
 
 	// Isolate the nodes without neighbors
 	const nodesWithoutNeighbors = Object.entries(outputToInput)
@@ -147,16 +152,17 @@ export const topologicalSort = (
 		: []
 }
 
-export const calculateANNGeneDistance = (
+export const calculateGeneDistance = (
 	gene1: ANNConnectionGene,
 	gene2: ANNConnectionGene
 ) => {
 	return gene1.weight - gene2.weight
 }
 
-export const mutateANNGeneWeight = (
+export const mutateGeneWeight = (
 	gene: ANNConnectionGene,
 	magnitude: number
 ) => {
 	gene.weight += uniformRandomWeight(magnitude)
 }
+

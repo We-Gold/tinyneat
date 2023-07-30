@@ -1,7 +1,7 @@
 import {
 	ANNConnectionGene,
 	createAdjacencyList,
-	mutateANNGeneWeight,
+	mutateGeneWeight,
 	topologicalSort,
 } from "./ann"
 import { Config } from "./config"
@@ -62,7 +62,9 @@ export const evolvePopulation = (
 		// Select the most fit member of the species to persist
 		const champion = sortedParents[0]
 
-		nextPopulation.push(champion)
+		nextPopulation.push(
+			createGenomeFromGenes(structuredClone(champion.genes), config)
+		)
 
 		// Create the remaining offspring for the next generation
 		for (
@@ -117,16 +119,15 @@ export const evolvePopulation = (
 				// Randomly mutate weights
 				for (const gene of childGenes) {
 					if (random(config.mutateWeightProbability))
-						mutateANNGeneWeight(
-							gene,
-							config.ann.weightMutationRange
-						)
+						mutateGeneWeight(gene, config.ann.weightMutationRange)
 				}
 			}
 
 			nextPopulation.push(createGenomeFromGenes(childGenes, config))
 		}
 	}
+
+	return nextPopulation
 }
 
 const calculateAdjustedFitnesses = (species: Genome[][]) => {

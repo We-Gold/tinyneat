@@ -1,14 +1,16 @@
-import { defaultConfig } from "./config"
+import { Config, PartialConfig, defaultConfig } from "./config"
 import { evolvePopulation } from "./evolve"
 import { Genome, createEmptyGenome } from "./genome"
 import { createHallOfFame } from "./halloffame"
 import { createInnovationHistory } from "./history"
-import { speciatePopulation } from "./species"
 
 // Create the TinyNEAT method export
-export default (config = defaultConfig) => {
+export default (partialConfig: PartialConfig) => {
+	// Fill in any missing details from the config using defaults
+	const config: Config = { ...defaultConfig, ...partialConfig }
+
 	// Create a list to store the population in
-	let population = Array(config.initialPopulationSize)
+	let population: Genome[] = Array(config.initialPopulationSize)
 
 	// Create a list for storing species
 	let species: Genome[][] = []
@@ -31,6 +33,8 @@ export default (config = defaultConfig) => {
 	// Track the current generation
 	let generation = 0
 
+	const getCurrentGeneration = () => generation
+
 	// Create a method to check if the evolution is complete
 	// TODO find some way to add custom stopping points
 	const complete = () => generation >= config.maxGenerations
@@ -39,21 +43,20 @@ export default (config = defaultConfig) => {
 		// Update the hall of fame
 		population.forEach((genome) => hallOfFame.tryAdding(genome))
 
-		species = speciatePopulation(
+		population = evolvePopulation(
 			population,
 			species,
-			config.excessCoefficient,
-			config.disjointCoefficient,
-			config.weightDifferenceCoefficient,
-			config.compatibilityThreshold
+			innovationHistory,
+			config
 		)
 
-		evolvePopulation(population, species, innovationHistory, config)
+		generation++
 	}
 
 	return {
 		getPopulation,
 		getPopulationIndexed,
+		getCurrentGeneration,
 		complete,
 		evolve,
 		getBestGenomes: hallOfFame.getBestGenomes,

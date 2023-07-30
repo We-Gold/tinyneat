@@ -10,7 +10,7 @@ export const createHallOfFame = (size: number) => {
 		if (contestant.fitness < minFitness) return
 
 		const index = bestGenomes.findIndex(
-			(element) => element.fitness <= contestant.fitness
+			(element) => element && element.fitness <= contestant.fitness
 		)
 
 		if (index === -1) {

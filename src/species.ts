@@ -54,7 +54,7 @@ export const speciatePopulation = (
 		}
 
 		// Create a new species if no matches were found
-		if (placed) {
+		if (!placed) {
 			species.push([genome])
 			nextRepresentative.push({
 				distance: Infinity,
@@ -67,7 +67,5 @@ export const speciatePopulation = (
 	for (const [index, s] of species.entries()) {
 		s[0] = s.splice(nextRepresentative[index].i, 1)[0]
 	}
-
-	return species
 }
 

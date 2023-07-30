@@ -1,20 +1,20 @@
-import { ANNConnectionGene, calculateANNGeneDistance, createANN } from "./ann"
+import { ANNConnectionGene, calculateGeneDistance, createNetwork } from "./ann"
 import { Config } from "./config"
-import {
-	chooseRandom,
-	chooseRandomIndex,
-	random,
-	uniformRandomWeight,
-} from "./helpers"
+import { chooseRandom, random, uniformRandomWeight } from "./helpers"
 import { Connection, InnovationHistory } from "./history"
 
-export type Genome = ReturnType<typeof createEmptyGenome>
-
-// Actually use this below, and put the creation into ANN
-export type ConnectionGene = {
+export interface ConnectionGene {
 	connection: Connection
+	weight: number
 	enabled: boolean
 	innovationNumber: number
+}
+
+export interface Genome {
+	genes: ConnectionGene[]
+	fitness: number
+	adjustedFitness: number
+	process: (inputs: number[]) => number[]
 }
 
 // TODO make this specific to each network type through the plugin system
@@ -54,7 +54,7 @@ export const createGenomeFromGenes = (
 			"Invalid neural network input or output size. Verify that there are at least 1 of each."
 		)
 
-	const neuralNetwork = createANN(
+	const neuralNetwork = createNetwork(
 		config.ann.inputSize,
 		config.ann.outputSize,
 		genes
@@ -104,7 +104,7 @@ export const calculateGenomeDistance = (
 			genome1.genes[g1].innovationNumber ===
 			genome2.genes[g2].innovationNumber
 		) {
-			weightDelta += calculateANNGeneDistance(
+			weightDelta += calculateGeneDistance(
 				genome1.genes[g1++],
 				genome1.genes[g2++]
 			)
@@ -212,14 +212,25 @@ export const mutateAddConnection = (
 	inputSize: number,
 	outputSize: number
 ) => {
-	let inputIndex = chooseRandomIndex(topoSorted)
+	// Create a list of indices corresponding to topoSorted
+	const topoSortedIndices = Array.from(
+		{ length: topoSorted.length },
+		(_, i) => i
+	)
 
 	// Make sure that the input is not an output node
-	while (inputIndex >= inputSize && inputIndex < inputSize + outputSize)
-		inputIndex = chooseRandomIndex(topoSorted)
+	const potentialInputIndices = topoSortedIndices.slice()
+	potentialInputIndices.splice(inputSize, outputSize)
+
+	const inputIndex = topoSorted[chooseRandom(potentialInputIndices)]
+
+	// Make sure that the output is not an input node
+	const potentialOutputIndices = topoSortedIndices.slice(
+		Math.max(inputIndex + 1, inputSize)
+	)
 
 	// Choose an output index that comes after the input
-	const outputIndex = chooseRandomIndex(topoSorted.slice(inputIndex + 1))
+	const outputIndex = topoSorted[chooseRandom(potentialOutputIndices)]
 
 	const existingConnection = genes.find(
 		(gene) =>
@@ -254,6 +265,8 @@ export const mutateAddNode = (
 
 	// Disable the current connection
 	connectionGene.enabled = false
+
+	// TODO: Handle crossover that leaves only a disabled node
 
 	// Determine the index/id of the new node
 	const newNodeId = topoSorted.length

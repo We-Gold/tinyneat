@@ -12,7 +12,7 @@ export const defaultConfig = {
 	mateOnlyProbability: 0.2, // Probability an offspring will be created only through crossover without mutation
 	addNodeProbability: 0.03, // Probability a new node gene will be added to the genome
 	addLinkProbability: 0.05, // Probability a new connection will be added
-	mutateWeightProbability: 0.07, // Probability a weight will be mutated
+	mutateWeightProbability: 0.3, // Probability a weight will be mutated
 	interspeciesMatingRate: 0.001, // Percentage of crossovers allowed to occur between parents of different species
 	mateByChoosingProbability: 0.6, // Probability that genes will be chosen one at a time from either parent during crossover
 	mateByAveragingProbability: 0.4, // Probability that matching genes will be averaged during crossover
@@ -30,4 +30,5 @@ export const defaultConfig = {
 }
 
 export type Config = typeof defaultConfig
+export type PartialConfig = Partial<Config>
 
