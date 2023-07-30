@@ -1,11 +1,18 @@
-import { ANNConnectionGene, calculateGeneDistance, createNetwork } from "./ann"
+// import {
+// 	averageGenes,
+// 	calculateGeneDistance,
+// 	cloneGene,
+// 	configureCloneGene,
+// 	configureNewGene,
+// 	configureRandomGene,
+// 	createNetwork,
+// } from "./nn/ann"
 import { Config } from "./config"
-import { chooseRandom, random, uniformRandomWeight } from "./helpers"
+import { chooseRandom, random } from "./helpers"
 import { Connection, InnovationHistory } from "./history"
 
 export interface ConnectionGene {
 	connection: Connection
-	weight: number
 	enabled: boolean
 	innovationNumber: number
 }
@@ -17,27 +24,26 @@ export interface Genome {
 	process: (inputs: number[]) => number[]
 }
 
-// TODO make this specific to each network type through the plugin system
-// Perhaps have a specific network creator object that is returned with the necessary details
 export const createEmptyGenome = (
 	innovationHistory: InnovationHistory,
 	config: Config
 ) => {
 	// Genes are indexed in the flattened form of: [inputs, outputs, hidden]
-	const genes: ANNConnectionGene[] = []
+	const genes: ConnectionGene[] = []
 
 	// Create a connection between every input and every output
-	for (let i = 0; i < config.ann.inputSize; i++) {
-		for (let o = 0; o < config.ann.outputSize; o++) {
-			const connection: Connection = [i, config.ann.inputSize + o]
+	for (let i = 0; i < config.inputSize; i++) {
+		for (let o = 0; o < config.outputSize; o++) {
+			const connection: Connection = [i, config.inputSize + o]
 			const innovationNumber = innovationHistory.getInnovation(connection)
 
-			genes.push({
-				connection,
-				weight: uniformRandomWeight(config.ann.weightMutationRange),
-				enabled: true,
-				innovationNumber,
-			})
+			genes.push(
+				config.nnPlugin.configureRandomGene({
+					connection,
+					enabled: true,
+					innovationNumber,
+				}) as ConnectionGene
+			)
 		}
 	}
 
@@ -45,18 +51,18 @@ export const createEmptyGenome = (
 }
 
 export const createGenomeFromGenes = (
-	genes: ANNConnectionGene[],
+	genes: ConnectionGene[],
 	config: Config
 ) => {
 	// Validate the neural network size
-	if (config.ann.inputSize < 1 || config.ann.outputSize < 1)
+	if (config.inputSize < 1 || config.outputSize < 1)
 		throw new Error(
 			"Invalid neural network input or output size. Verify that there are at least 1 of each."
 		)
 
-	const neuralNetwork = createNetwork(
-		config.ann.inputSize,
-		config.ann.outputSize,
+	const neuralNetwork = config.nnPlugin.createNetwork(
+		config.inputSize,
+		config.outputSize,
 		genes
 	)
 
@@ -73,7 +79,8 @@ export const calculateGenomeDistance = (
 	genome2: Genome,
 	excessCoefficient: number,
 	disjointCoefficient: number,
-	weightDifferenceCoefficient: number
+	weightDifferenceCoefficient: number,
+	config: Config
 ) => {
 	// Make sure that genome 1 is the larger genome
 	if (genome2.genes.length > genome1.genes.length) {
@@ -104,7 +111,7 @@ export const calculateGenomeDistance = (
 			genome1.genes[g1].innovationNumber ===
 			genome2.genes[g2].innovationNumber
 		) {
-			weightDelta += calculateGeneDistance(
+			weightDelta += config.nnPlugin.calculateGeneDistance(
 				genome1.genes[g1++],
 				genome1.genes[g2++]
 			)
@@ -136,8 +143,7 @@ export const calculateGenomeDistance = (
 export const crossGenomes = (
 	genome1: Genome,
 	genome2: Genome,
-	mateByChoosingProbability: number
-	// mateByAveragingProbability: number
+	config: Config
 ) => {
 	// NOTE: Currently doesn't handle an equal fitness any differently
 	/*
@@ -157,7 +163,7 @@ export const crossGenomes = (
 	const genome1Length = genome1.genes.length
 	const genome2Length = genome2.genes.length
 
-	const newGenes: ANNConnectionGene[] = []
+	const newGenes: ConnectionGene[] = []
 
 	// Create pointers for each of the genomes
 	let g1 = 0
@@ -169,24 +175,23 @@ export const crossGenomes = (
 
 		// Handle any excess genes
 		if (g2 >= genome2Length) {
-			newGenes.push({ ...gene1 })
+			newGenes.push(config.nnPlugin.cloneGene(gene1) as ConnectionGene)
 			g1++
 		}
 		// Store weight delta when there are matching genes
 		else if (gene1.innovationNumber === gene2.innovationNumber) {
-			if (random(mateByChoosingProbability)) {
+			if (random(config.mateByChoosingProbability)) {
 				// Choose one of the genes to add to the new genome
-				newGenes.push({
-					...(Math.random() < 0.5 ? gene1 : gene2),
-				})
+				newGenes.push(
+					config.nnPlugin.cloneGene(
+						Math.random() < 0.5 ? gene1 : gene2
+					) as ConnectionGene
+				)
 			} else {
-				const averageWeight = (gene1.weight + gene2.weight) / 2
-
 				// Add the averaged connection to the new genome
-				newGenes.push({
-					...gene1,
-					weight: averageWeight,
-				})
+				newGenes.push(
+					config.nnPlugin.averageGenes(gene1, gene2) as ConnectionGene
+				)
 			}
 
 			g1++
@@ -194,10 +199,13 @@ export const crossGenomes = (
 		}
 		// Directly insert any disjoint connections from the fitter genome
 		else if (gene1.innovationNumber > gene2.innovationNumber) {
-			newGenes.push({ ...gene1 })
+			newGenes.push(config.nnPlugin.cloneGene(gene1) as ConnectionGene)
 			g2++
 		} else if (gene1.innovationNumber < gene2.innovationNumber) {
-			if (equalFitness) newGenes.push({ ...gene2 })
+			if (equalFitness)
+				newGenes.push(
+					config.nnPlugin.cloneGene(gene2) as ConnectionGene
+				)
 			g1++
 		}
 	}
@@ -206,11 +214,12 @@ export const crossGenomes = (
 }
 
 export const mutateAddConnection = (
-	genes: ANNConnectionGene[],
+	genes: ConnectionGene[],
 	innovationHistory: InnovationHistory,
 	topoSorted: number[],
 	inputSize: number,
-	outputSize: number
+	outputSize: number,
+	config: Config
 ) => {
 	// Create a list of indices corresponding to topoSorted
 	const topoSortedIndices = Array.from(
@@ -248,25 +257,25 @@ export const mutateAddConnection = (
 
 	const innovationNumber = innovationHistory.getInnovation(connection)
 
-	genes.push({
-		connection,
-		weight: 1.0,
-		enabled: true,
-		innovationNumber,
-	})
+	genes.push(
+		config.nnPlugin.configureNewGene({
+			connection,
+			enabled: true,
+			innovationNumber,
+		}) as ConnectionGene
+	)
 }
 
 export const mutateAddNode = (
-	genes: ANNConnectionGene[],
+	genes: ConnectionGene[],
 	innovationHistory: InnovationHistory,
-	topoSorted: number[]
+	topoSorted: number[],
+	config: Config
 ) => {
-	const connectionGene: ANNConnectionGene = chooseRandom(genes)
+	const connectionGene: ConnectionGene = chooseRandom(genes)
 
 	// Disable the current connection
 	connectionGene.enabled = false
-
-	// TODO: Handle crossover that leaves only a disabled node
 
 	// Determine the index/id of the new node
 	const newNodeId = topoSorted.length
@@ -280,18 +289,24 @@ export const mutateAddNode = (
 		connectionGene.connection[1],
 	]
 
-	genes.push({
-		connection: inputConnection,
-		weight: 1.0,
-		enabled: true,
-		innovationNumber: innovationHistory.getInnovation(inputConnection),
-	})
+	genes.push(
+		config.nnPlugin.configureNewGene({
+			connection: inputConnection,
+			enabled: true,
+			innovationNumber: innovationHistory.getInnovation(inputConnection),
+		}) as ConnectionGene
+	)
 
-	genes.push({
-		connection: outputConnection,
-		weight: connectionGene.weight,
-		enabled: true,
-		innovationNumber: innovationHistory.getInnovation(outputConnection),
-	})
+	genes.push(
+		config.nnPlugin.configureCloneGene(
+			{
+				connection: outputConnection,
+				enabled: true,
+				innovationNumber:
+					innovationHistory.getInnovation(outputConnection),
+			},
+			connectionGene
+		) as ConnectionGene
+	)
 }
 

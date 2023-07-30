@@ -20,13 +20,13 @@ test.each(Object.entries(sizes))("Empty genome has correct properties for size %
 
     expect(genome.fitness).toBe(0)
 
-    expect(genome.genes.length).toBe(config.ann.inputSize * config.ann.outputSize)
+    expect(genome.genes.length).toBe(config.inputSize * config.outputSize)
 
     // Test neural network feature
     
-    const inputs = Array(config.ann.inputSize).fill(0.5)
+    const inputs = Array(config.inputSize).fill(0.5)
 
     const outputs = genome.process(inputs)
 
-    expect(outputs).toHaveLength(config.ann.outputSize)
+    expect(outputs).toHaveLength(config.outputSize)
 })

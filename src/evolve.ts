@@ -1,11 +1,6 @@
-import {
-	ANNConnectionGene,
-	createAdjacencyList,
-	mutateGeneWeight,
-	topologicalSort,
-} from "./ann"
 import { Config } from "./config"
 import {
+	ConnectionGene,
 	Genome,
 	createGenomeFromGenes,
 	crossGenomes,
@@ -14,6 +9,7 @@ import {
 } from "./genome"
 import { chooseRandom, random } from "./helpers"
 import { InnovationHistory } from "./history"
+import { createAdjacencyList, topologicalSort } from "./nn/nnplugin"
 import { speciatePopulation } from "./species"
 
 export const evolvePopulation = (
@@ -25,14 +21,7 @@ export const evolvePopulation = (
 	// TODO: Consider adding a minimum species size
 
 	// Separate the current population into species
-	speciatePopulation(
-		population,
-		species,
-		config.excessCoefficient,
-		config.disjointCoefficient,
-		config.weightDifferenceCoefficient,
-		config.compatibilityThreshold
-	)
+	speciatePopulation(population, species, config)
 
 	// Adjust the fitness of each organism to normalize based on species size
 	calculateAdjustedFitnesses(species)
@@ -75,24 +64,16 @@ export const evolvePopulation = (
 			const parent1 = chooseRandom(viableParents)
 			const parent2 = chooseRandom(viableParents)
 
-			let childGenes: ANNConnectionGene[]
+			let childGenes: ConnectionGene[]
 
 			if (random(config.mateOnlyProbability)) {
-				childGenes = crossGenomes(
-					parent1,
-					parent2,
-					config.mateByChoosingProbability
-				)
+				childGenes = crossGenomes(parent1, parent2, config)
 			} else {
 				if (random(config.mutateOnlyProbability)) {
 					// Only clone a parent, without crossover
 					childGenes = structuredClone(parent1.genes)
 				} else {
-					childGenes = crossGenomes(
-						parent1,
-						parent2,
-						config.mateByChoosingProbability
-					)
+					childGenes = crossGenomes(parent1, parent2, config)
 				}
 
 				// Create an adjacency list for storing connections in a
@@ -109,17 +90,23 @@ export const evolvePopulation = (
 						childGenes,
 						innovationHistory,
 						topoSorted,
-						config.ann.inputSize,
-						config.ann.outputSize
+						config.inputSize,
+						config.outputSize,
+						config
 					)
 				} else if (random(config.addNodeProbability)) {
-					mutateAddNode(childGenes, innovationHistory, topoSorted)
+					mutateAddNode(
+						childGenes,
+						innovationHistory,
+						topoSorted,
+						config
+					)
 				}
 
 				// Randomly mutate weights
 				for (const gene of childGenes) {
 					if (random(config.mutateWeightProbability))
-						mutateGeneWeight(gene, config.ann.weightMutationRange)
+						config.nnPlugin.mutateGeneWeight(gene)
 				}
 			}
 

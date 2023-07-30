@@ -17,8 +17,10 @@ const FRAME_RATE = 60
 
 let step = 0
 
+// TODO: add plugins as extra exports
+
 // TODO: Verify missing data in plugin specific config
-const tn = TinyNEAT({maxGenerations: 100, initialPopulationSize: POPULATION_SIZE, ann: {inputSize: 16, outputSize: 1, weightMutationRange: 1.0}})
+const tn = TinyNEAT({maxGenerations: 100, initialPopulationSize: POPULATION_SIZE, inputSize: 16, outputSize: 1})
 
 const MAP = "loop" // or "90s"
 
@@ -68,7 +70,6 @@ function draw(p) {
         const outputs = population[i].process(car.getInputs())
 
         population[i].fitness += car.receiveOutput(outputs[0])
-
 
         // Render every 20th car
         if (i % 20 === 0) {

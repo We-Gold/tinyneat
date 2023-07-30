@@ -1,3 +1,5 @@
+import ANNPlugin from "./nn/ann"
+
 // Closely based on parameters of the original NEAT paper
 export const defaultConfig = {
 	initialPopulationSize: 150, // Number of networks in the population
@@ -21,12 +23,11 @@ export const defaultConfig = {
 
 	hallOfFameSize: 10, // The number of top-performing individuals to store
 
-	ann: {
-		// Configuration options for the artificial neural network
-		inputSize: 3,
-		outputSize: 2,
-		weightMutationRange: 1.0, // The maximum magnitude of a mutation that changes the weight of a connection
-	},
+	inputSize: 3,
+	outputSize: 2,
+
+	// Plugin for the specific type of neural network (ANN, RNN, etc)
+	nnPlugin: ANNPlugin({ weightMutationRange: 1.0 }),
 }
 
 export type Config = typeof defaultConfig
