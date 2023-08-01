@@ -63,6 +63,9 @@ function draw(p) {
 			Array(tn.getPopulation().length),
 			() => new Car(p, 50, 200, INITIAL_ANGLE)
 		)
+
+        if (tn.complete())
+            p.noLoop()
 	}
 
 	const population = tn.getPopulation()
