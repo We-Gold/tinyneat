@@ -18,8 +18,6 @@ export const evolvePopulation = (
 	innovationHistory: InnovationHistory,
 	config: Config
 ) => {
-	// TODO: Consider adding a minimum species size
-
 	// Separate the current population into species
 	speciatePopulation(population, species, config)
 
@@ -28,8 +26,6 @@ export const evolvePopulation = (
 
 	// Allocate the appropriate number of offspring for each species
 	const offspringAllocation = allocateOffspring(population, species)
-
-	// TODO: Consider adding the ability to turn off champions
 
 	const nextPopulation = []
 
@@ -52,7 +48,11 @@ export const evolvePopulation = (
 		const champion = sortedParents[0]
 
 		nextPopulation.push(
-			createGenomeFromGenes(structuredClone(champion.genes), config)
+			createGenomeFromGenes(
+				structuredClone(champion.genes),
+				champion.maxGeneIndex,
+				config
+			)
 		)
 
 		// Create the remaining offspring for the next generation
@@ -61,19 +61,26 @@ export const evolvePopulation = (
 			offspring < offspringAllocation[i] - 1;
 			offspring++
 		) {
-			const parent1 = chooseRandom(viableParents)
-			const parent2 = chooseRandom(viableParents)
+			const parent1: Genome = chooseRandom(viableParents)
+			const parent2: Genome = chooseRandom(viableParents)
 
 			let childGenes: ConnectionGene[]
 
+			let maxGeneIndex: number
+
 			if (random(config.mateOnlyProbability)) {
-				childGenes = crossGenomes(parent1, parent2, config)
+				const result = crossGenomes(parent1, parent2, config)
+				childGenes = result.newGenes
+				maxGeneIndex = result.maxGeneIndex
 			} else {
 				if (random(config.mutateOnlyProbability)) {
 					// Only clone a parent, without crossover
 					childGenes = structuredClone(parent1.genes)
+					maxGeneIndex = parent1.maxGeneIndex
 				} else {
-					childGenes = crossGenomes(parent1, parent2, config)
+					const result = crossGenomes(parent1, parent2, config)
+					childGenes = result.newGenes
+					maxGeneIndex = result.maxGeneIndex
 				}
 
 				// Create an adjacency list for storing connections in a
@@ -90,15 +97,17 @@ export const evolvePopulation = (
 						childGenes,
 						innovationHistory,
 						topoSorted,
+						maxGeneIndex,
 						config.inputSize,
 						config.outputSize,
 						config
 					)
 				} else if (random(config.addNodeProbability)) {
-					mutateAddNode(
+					// Adds a new node, so update the gene counter
+					maxGeneIndex = mutateAddNode(
 						childGenes,
 						innovationHistory,
-						topoSorted,
+						maxGeneIndex,
 						config
 					)
 				}
@@ -110,7 +119,9 @@ export const evolvePopulation = (
 				}
 			}
 
-			nextPopulation.push(createGenomeFromGenes(childGenes, config))
+			nextPopulation.push(
+				createGenomeFromGenes(childGenes, maxGeneIndex, config)
+			)
 		}
 	}
 

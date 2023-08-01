@@ -7,3 +7,4 @@ export const chooseRandomIndex = (array: any[]) =>
 
 export const uniformRandomWeight = (magnitude: number) =>
 	(2 * Math.random() - 1) * magnitude
+

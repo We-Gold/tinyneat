@@ -8,10 +8,6 @@ import { Genome, calculateGenomeDistance } from "./genome"
 export const speciatePopulation = (
 	population: Genome[],
 	species: Genome[][],
-	// excessCoefficient: number,
-	// disjointCoefficient: number,
-	// weightDifferenceCoefficient: number,
-	// compatibilityThreshold: number,
 	config: Config
 ) => {
 	// Remove all genomes from the previous geneation besides the
@@ -43,7 +39,10 @@ export const speciatePopulation = (
 
 			// Add the genome to the appropriate species and track the closest
 			// individual to the representative
-			if (distanceBetweenGenomes <= config.compatibilityThreshold) {
+			if (
+				distanceBetweenGenomes < config.compatibilityThreshold &&
+				!placed
+			) {
 				s.push(genome)
 
 				if (distanceBetweenGenomes < nextRepresentative[index].distance)

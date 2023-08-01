@@ -1,4 +1,4 @@
-import { Activation, ActivationType, modifiedSigmoid } from "./activations"
+import { Activation, ActivationType } from "./activations"
 import { ConnectionGene } from "../genome"
 import { uniformRandomWeight } from "../helpers"
 import { NNPlugin, createAdjacencyList, topologicalSort } from "./nnplugin"
@@ -11,7 +11,7 @@ const createNetwork = (
 	inputSize: number,
 	outputSize: number,
 	genes: ConnectionGene[],
-	activation = modifiedSigmoid
+	activation: (x: number) => number
 ) => {
 	// Create a map between connections and weights
 	const weights: { [key: string]: number } = {}
@@ -105,7 +105,6 @@ const averageGenes = (gene1: ConnectionGene, gene2: ConnectionGene) => {
 }
 
 const configureRandomGene = (gene: ConnectionGene, magnitude: number) => {
-	// TODO: this should use internal configuration
 	return { ...gene, weight: uniformRandomWeight(magnitude) }
 }
 
@@ -127,11 +126,13 @@ const defaultConfig: {
 } = {
 	// Configuration options for the artificial neural network
 	weightMutationRange: 1.0, // The maximum magnitude of a mutation that changes the weight of a connection
-	activation: "modifiedSigmoid",
+	activation: "posAndNegSigmoid",
 }
 
 // Create the standard Artificial Neural Network plugin
-const ANNPlugin = (partialConfig: Partial<typeof defaultConfig>): NNPlugin => {
+const ANNPlugin = (
+	partialConfig: Partial<typeof defaultConfig> = {}
+): NNPlugin => {
 	// Fill in any missing details from the config using defaults
 	const config: typeof defaultConfig = { ...defaultConfig, ...partialConfig }
 

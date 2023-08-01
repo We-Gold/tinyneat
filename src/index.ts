@@ -3,11 +3,15 @@ import { evolvePopulation } from "./evolve"
 import { Genome, createEmptyGenome } from "./genome"
 import { createHallOfFame } from "./halloffame"
 import { createInnovationHistory } from "./history"
+import * as plugins from "./plugins"
 
 // Create the TinyNEAT method export
-export default (partialConfig: PartialConfig) => {
+const TinyNEAT = (partialConfig: PartialConfig = {}) => {
 	// Fill in any missing details from the config using defaults
 	const config: Config = { ...defaultConfig, ...partialConfig }
+
+	// Create the logging manager to handle all logging plugins
+	const loggingManger = plugins.LoggingManager(config.loggingPlugins)
 
 	// Create a list to store the population in
 	let population: Genome[] = Array(config.initialPopulationSize)
@@ -25,6 +29,9 @@ export default (partialConfig: PartialConfig) => {
 	for (let i = 0; i < config.initialPopulationSize; i++) {
 		population[i] = createEmptyGenome(innovationHistory, config)
 	}
+
+	// Dispatch the initial population event
+	loggingManger.handleInitialPopulation?.({ population, config })
 
 	// Create helper methods for the population
 	const getPopulation = () => population
@@ -51,6 +58,16 @@ export default (partialConfig: PartialConfig) => {
 		)
 
 		generation++
+
+		// Dispatch the evolve event
+		loggingManger.handleEvolve?.({
+			population,
+			config,
+			generation,
+			species,
+			bestGenomes: hallOfFame.getBestGenomes(),
+			complete: complete(),
+		})
 	}
 
 	return {
@@ -62,4 +79,6 @@ export default (partialConfig: PartialConfig) => {
 		getBestGenomes: hallOfFame.getBestGenomes,
 	}
 }
+
+export { TinyNEAT, plugins }
 

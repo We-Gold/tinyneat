@@ -1,12 +1,3 @@
-// import {
-// 	averageGenes,
-// 	calculateGeneDistance,
-// 	cloneGene,
-// 	configureCloneGene,
-// 	configureNewGene,
-// 	configureRandomGene,
-// 	createNetwork,
-// } from "./nn/ann"
 import { Config } from "./config"
 import { chooseRandom, random } from "./helpers"
 import { Connection, InnovationHistory } from "./history"
@@ -22,6 +13,7 @@ export interface Genome {
 	fitness: number
 	adjustedFitness: number
 	process: (inputs: number[]) => number[]
+	maxGeneIndex: number // Tracks the current highest node index
 }
 
 export const createEmptyGenome = (
@@ -47,11 +39,14 @@ export const createEmptyGenome = (
 		}
 	}
 
-	return createGenomeFromGenes(genes, config)
+	const maxGeneIndex = config.inputSize + config.outputSize - 1
+
+	return createGenomeFromGenes(genes, maxGeneIndex, config)
 }
 
 export const createGenomeFromGenes = (
 	genes: ConnectionGene[],
+	maxGeneIndex: number,
 	config: Config
 ) => {
 	// Validate the neural network size
@@ -71,6 +66,7 @@ export const createGenomeFromGenes = (
 		fitness: 0,
 		adjustedFitness: 0,
 		process: neuralNetwork.process,
+		maxGeneIndex,
 	}
 }
 
@@ -160,6 +156,11 @@ export const crossGenomes = (
 		;[genome1, genome2] = [genome2, genome1]
 	}
 
+	const maxGeneIndex = equalFitness
+		? Math.max(genome1.maxGeneIndex, genome2.maxGeneIndex)
+		: genome1.maxGeneIndex
+	// const maxGeneIndex = genome1.maxGeneIndex
+
 	const genome1Length = genome1.genes.length
 	const genome2Length = genome2.genes.length
 
@@ -200,30 +201,34 @@ export const crossGenomes = (
 		// Directly insert any disjoint connections from the fitter genome
 		else if (gene1.innovationNumber > gene2.innovationNumber) {
 			newGenes.push(config.nnPlugin.cloneGene(gene1) as ConnectionGene)
+			g1++ // Avoid cloning the same gene twice
 			g2++
 		} else if (gene1.innovationNumber < gene2.innovationNumber) {
-			if (equalFitness)
+			if (equalFitness) {
 				newGenes.push(
 					config.nnPlugin.cloneGene(gene2) as ConnectionGene
 				)
+				g2++
+			}
 			g1++
 		}
 	}
 
-	return newGenes
+	return { newGenes, maxGeneIndex }
 }
 
 export const mutateAddConnection = (
 	genes: ConnectionGene[],
 	innovationHistory: InnovationHistory,
 	topoSorted: number[],
+	maxGeneIndex: number,
 	inputSize: number,
 	outputSize: number,
 	config: Config
 ) => {
 	// Create a list of indices corresponding to topoSorted
 	const topoSortedIndices = Array.from(
-		{ length: topoSorted.length },
+		{ length: maxGeneIndex + 1 },
 		(_, i) => i
 	)
 
@@ -231,15 +236,28 @@ export const mutateAddConnection = (
 	const potentialInputIndices = topoSortedIndices.slice()
 	potentialInputIndices.splice(inputSize, outputSize)
 
-	const inputIndex = topoSorted[chooseRandom(potentialInputIndices)]
+	let inputIndex = chooseRandom(potentialInputIndices)
 
 	// Make sure that the output is not an input node
-	const potentialOutputIndices = topoSortedIndices.slice(
-		Math.max(inputIndex + 1, inputSize)
-	)
+	const potentialOutputIndices = topoSortedIndices.slice(inputSize)
 
 	// Choose an output index that comes after the input
-	const outputIndex = topoSorted[chooseRandom(potentialOutputIndices)]
+	let outputIndex = chooseRandom(potentialOutputIndices)
+
+	// Avoid creating a cyclic connection
+	if (inputIndex === outputIndex) return
+
+	// Make sure the connection is in order
+	const actualInputIndex = topoSorted.findIndex(
+		(value) => value === inputIndex
+	)
+	const actualOutputIndex = topoSorted.findIndex(
+		(value) => value === outputIndex
+	)
+	
+	if (actualInputIndex > actualOutputIndex) {
+		;[inputIndex, outputIndex] = [outputIndex, inputIndex]
+	}
 
 	const existingConnection = genes.find(
 		(gene) =>
@@ -269,7 +287,7 @@ export const mutateAddConnection = (
 export const mutateAddNode = (
 	genes: ConnectionGene[],
 	innovationHistory: InnovationHistory,
-	topoSorted: number[],
+	maxGeneIndex: number,
 	config: Config
 ) => {
 	const connectionGene: ConnectionGene = chooseRandom(genes)
@@ -278,7 +296,7 @@ export const mutateAddNode = (
 	connectionGene.enabled = false
 
 	// Determine the index/id of the new node
-	const newNodeId = topoSorted.length
+	const newNodeId = maxGeneIndex + 1
 
 	const inputConnection: Connection = [
 		connectionGene.connection[0],
@@ -308,5 +326,7 @@ export const mutateAddNode = (
 			connectionGene
 		) as ConnectionGene
 	)
+
+	return newNodeId
 }
 

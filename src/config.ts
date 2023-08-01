@@ -1,4 +1,5 @@
-import ANNPlugin from "./nn/ann"
+import { Logger } from "./logging/loggingmanager"
+import { ANNPlugin, ConsoleLogger } from "./plugins"
 
 // Closely based on parameters of the original NEAT paper
 export const defaultConfig = {
@@ -27,7 +28,10 @@ export const defaultConfig = {
 	outputSize: 2,
 
 	// Plugin for the specific type of neural network (ANN, RNN, etc)
-	nnPlugin: ANNPlugin({ weightMutationRange: 1.0 }),
+	nnPlugin: ANNPlugin(),
+
+	// Plugins for logging data
+	loggingPlugins: <Logger[]>[ConsoleLogger()],
 }
 
 export type Config = typeof defaultConfig

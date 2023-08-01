@@ -9,10 +9,10 @@
 		/* Bundler mode */
 		"moduleResolution": "bundler",
 		"resolveJsonModule": true,
-		"isolatedModules": true,
 		"declaration": true,
 		"outDir": "dist",
 		"declarationMap": true,
+		"emitDeclarationOnly": true,
 
 		/* Linting */
 		"strict": true,
