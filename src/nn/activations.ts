@@ -8,6 +8,9 @@ export const tanh = (x: number) => Math.tanh(x)
 
 export const relu = (x: number) => (x > 0 ? x : 0)
 
+/**
+ * A set of built-in activation methods
+ */
 export type ActivationType =
 	| "sigmoid"
 	| "modifiedSigmoid"
@@ -15,6 +18,9 @@ export type ActivationType =
 	| "relu"
 	| "posAndNegSigmoid"
 
+/**
+ * A dictionary that provides access to each of the built-in activation methods.
+ */
 export const Activation: Record<ActivationType, (x: number) => number> = {
 	sigmoid,
 	modifiedSigmoid,

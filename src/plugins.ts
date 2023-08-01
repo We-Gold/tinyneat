@@ -10,6 +10,8 @@ import { LoggingManager } from "./logging/loggingmanager"
 
 import ConsoleLogger from "./logging/consolelogger"
 
+import * as helpers from "./helpers"
+
 export {
 	createAdjacencyList,
 	topologicalSort,
@@ -17,5 +19,6 @@ export {
 	ANNPlugin,
 	LoggingManager,
 	ConsoleLogger,
+	helpers,
 }
 

@@ -15,6 +15,10 @@ export type EvolveData = {
 	complete: boolean
 }
 
+/**
+ * Defines the interface for a logging plugin.
+ * All methods are optional.
+ */
 export interface Logger {
 	handleInitialPopulation?: (data: InitialPopulationData) => void
 	handleEvolve?: (data: EvolveData) => void

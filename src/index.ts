@@ -5,7 +5,12 @@ import { createHallOfFame } from "./halloffame"
 import { createInnovationHistory } from "./history"
 import * as plugins from "./plugins"
 
-// Create the TinyNEAT method export
+/**
+ * Creates a NEAT interface using the given configuration.
+ *
+ * Change only the parts that need to be configured,
+ * the rest will be filled in from the default configuration.
+ */
 const TinyNEAT = (partialConfig: PartialConfig = {}) => {
 	// Fill in any missing details from the config using defaults
 	const config: Config = { ...defaultConfig, ...partialConfig }

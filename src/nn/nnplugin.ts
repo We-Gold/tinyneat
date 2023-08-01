@@ -1,11 +1,18 @@
 import { ConnectionGene } from "../genome"
 
+/**
+ * Defines the interface for any neural network plugin.
+ * Each method is required. See ann.ts for an example.
+ *
+ * Note: All methods that return {} actually return
+ * a type that extends ConnectionGene, with any plugin-specific
+ * data.
+ */
 export interface NNPlugin {
 	createNetwork: (
 		inputSize: number,
 		outputSize: number,
-		genes: ConnectionGene[],
-		activation?: (x: number) => number
+		genes: ConnectionGene[]
 	) => { process: (inputs: number[]) => number[] }
 	calculateGeneDistance: (
 		gene1: ConnectionGene,
@@ -22,6 +29,10 @@ export interface NNPlugin {
 	) => {}
 }
 
+/**
+ * Create a list that maps nodes to all of the nodes that lead from them,
+ * and a list that maps nodes to all of the nodes that lead to them.
+ */
 export const createAdjacencyList = (genes: ConnectionGene[]) => {
 	// Create lists to store input to output relationships and vice versa
 	const inputToOutput: { [key: number]: number[] } = {}
@@ -48,6 +59,9 @@ export const createAdjacencyList = (genes: ConnectionGene[]) => {
 
 /**
  * Use Kahn's algorithm to topologically sort the nodes of the network.
+ *
+ * This essentially provides an ordering for executing the neural network,
+ * however, this is only applicable for directed acyclic graphs.
  */
 export const topologicalSort = (
 	inputToOutput: { [key: number]: number[] },

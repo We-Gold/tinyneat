@@ -7,7 +7,7 @@ interface ANNConnectionGene extends ConnectionGene {
 	weight: number
 }
 
-const createNetwork = (
+const createANNNetwork = (
 	inputSize: number,
 	outputSize: number,
 	genes: ConnectionGene[],
@@ -142,7 +142,7 @@ const ANNPlugin = (
 			outputSize: number,
 			genes: ConnectionGene[]
 		) =>
-			createNetwork(
+			createANNNetwork(
 				inputSize,
 				outputSize,
 				genes,

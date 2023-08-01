@@ -45,6 +45,7 @@ export const speciatePopulation = (
 			) {
 				s.push(genome)
 
+				// Store this individual if it is the closest to the previous species representative
 				if (distanceBetweenGenomes < nextRepresentative[index].distance)
 					nextRepresentative[index] = {
 						distance: distanceBetweenGenomes,

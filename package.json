@@ -1,7 +1,27 @@
 {
 	"name": "tinyneat",
-	"version": "0.0.0",
+	"author": "Weaver Goldman <we.goldm@gmail.com>",
+	"description": "TinyNEAT is a tiny, js-native NEAT (NeuroEvolution of Augmenting Topologies) library, meant to easily incorporate into any codebase.",
+	"version": "1.0.0",
 	"type": "module",
+	"license": "MIT",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/We-Gold/tinyneat"
+	},
+	"bugs": {
+		"url": "https://github.com/We-Gold/tinyneat/issues"
+	},
+	"keywords": [
+		"neat",
+		"neat-algorithm",
+		"neuroevolution",
+		"neural-network",
+		"machine-learning",
+		"ga",
+		"genetic-algorithm",
+		"p5js"
+	],
 	"files": [
 		"dist"
 	],
@@ -19,9 +39,13 @@
 		"build": "vite build && tsc",
 		"preview": "vite preview",
 		"test": "vitest",
-		"bench": "vitest bench"
+		"bench": "vitest bench",
+		"docs": "typedoc",
+		"pack-test": "npm pack --dry-run"
 	},
 	"devDependencies": {
+		"typedoc": "^0.24.8",
+		"typedoc-theme-hierarchy": "^4.0.0",
 		"typescript": "^5.0.2",
 		"vite": "^4.4.5",
 		"vitest": "^0.33.0"

@@ -24,8 +24,8 @@ export const defaultConfig = {
 
 	hallOfFameSize: 10, // The number of top-performing individuals to store
 
-	inputSize: 3,
-	outputSize: 2,
+	inputSize: 3, // The number of inputs to each neural network
+	outputSize: 2, // The number of outputs of each neural network
 
 	// Plugin for the specific type of neural network (ANN, RNN, etc)
 	nnPlugin: ANNPlugin(),

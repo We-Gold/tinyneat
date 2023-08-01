@@ -2,6 +2,11 @@ import { Config } from "./config"
 import { chooseRandom, random } from "./helpers"
 import { Connection, InnovationHistory } from "./history"
 
+/**
+ * Represents a connection between two node genes.
+ * Extend this type to encode weight, recurrence, etc,
+ * whatever is appropriate for the neural network plugin.
+ */
 export interface ConnectionGene {
 	connection: Connection
 	enabled: boolean
@@ -13,7 +18,7 @@ export interface Genome {
 	fitness: number
 	adjustedFitness: number
 	process: (inputs: number[]) => number[]
-	maxGeneIndex: number // Tracks the current highest node index
+	maxGeneIndex: number // Tracks the current highest node gene index
 }
 
 export const createEmptyGenome = (
@@ -39,6 +44,7 @@ export const createEmptyGenome = (
 		}
 	}
 
+	// Store the highest node gene index in the current genome
 	const maxGeneIndex = config.inputSize + config.outputSize - 1
 
 	return createGenomeFromGenes(genes, maxGeneIndex, config)
@@ -86,6 +92,7 @@ export const calculateGenomeDistance = (
 	const genome1Length = genome1.genes.length
 	const genome2Length = genome2.genes.length
 
+	// Create trackers for each of the factors in genome distance
 	let excess = genome1Length - genome2Length
 	let disjoint = 0
 	let weightDelta = 0
@@ -141,7 +148,6 @@ export const crossGenomes = (
 	genome2: Genome,
 	config: Config
 ) => {
-	// NOTE: Currently doesn't handle an equal fitness any differently
 	/*
     Disjoint and excess genes are inherited from the more fit parent, or if they are equally fit, 
     each gene is inherited from either parent randomly. 
@@ -156,10 +162,10 @@ export const crossGenomes = (
 		;[genome1, genome2] = [genome2, genome1]
 	}
 
+	// Determine which gene index the child genome will inherit
 	const maxGeneIndex = equalFitness
 		? Math.max(genome1.maxGeneIndex, genome2.maxGeneIndex)
 		: genome1.maxGeneIndex
-	// const maxGeneIndex = genome1.maxGeneIndex
 
 	const genome1Length = genome1.genes.length
 	const genome2Length = genome2.genes.length
@@ -208,7 +214,7 @@ export const crossGenomes = (
 				newGenes.push(
 					config.nnPlugin.cloneGene(gene2) as ConnectionGene
 				)
-				g2++
+				g2++ // Avoid cloning the same gene twice
 			}
 			g1++
 		}
@@ -254,7 +260,7 @@ export const mutateAddConnection = (
 	const actualOutputIndex = topoSorted.findIndex(
 		(value) => value === outputIndex
 	)
-	
+
 	if (actualInputIndex > actualOutputIndex) {
 		;[inputIndex, outputIndex] = [outputIndex, inputIndex]
 	}

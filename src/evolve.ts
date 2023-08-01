@@ -129,6 +129,7 @@ export const evolvePopulation = (
 }
 
 const calculateAdjustedFitnesses = (species: Genome[][]) => {
+	// Normalize the fitness of each species by the species size
 	for (const s of species) {
 		for (const genome of s) {
 			genome.adjustedFitness = genome.fitness / s.length
@@ -142,6 +143,7 @@ const allocateOffspring = (population: Genome[], species: Genome[][]) => {
 		return s.reduce((acc, curr) => acc + curr.adjustedFitness, 0) / s.length
 	})
 
+	// Sum all of the species average fitnesses
 	const totalAverageFitness = speciesFitnessAverages.reduce(
 		(acc, curr) => acc + curr,
 		0

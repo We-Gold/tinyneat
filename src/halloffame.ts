@@ -1,5 +1,8 @@
 import { Genome } from "./genome"
 
+/**
+ * Create an object that tracks the top performing individuals.
+ */
 export const createHallOfFame = (size: number) => {
 	const bestGenomes: Genome[] = Array(size)
 
@@ -9,6 +12,7 @@ export const createHallOfFame = (size: number) => {
 		// Avoid any genomes worse than all the hall of fame
 		if (contestant.fitness < minFitness) return
 
+		// Find the appropriate spot for this contestant in the hall of fame
 		const index = bestGenomes.findIndex(
 			(element) => element && element.fitness <= contestant.fitness
 		)
