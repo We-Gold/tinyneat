@@ -105,8 +105,7 @@ export const calculateGenomeDistance = (
 	let g2 = 0
 
 	// Calculate the N factor for normalizing genome distance
-	const largeGenomeThreshold = 20
-	const N = genome1Length > largeGenomeThreshold ? genome1Length : 1
+	const N = genome1Length > config.largeNetworkSize ? genome1Length : 1
 
 	while (g1 < genome1Length && g2 < genome2Length) {
 		// Store weight delta when there are matching genes
@@ -143,18 +142,17 @@ export const calculateGenomeDistance = (
 	)
 }
 
+/**
+ * Disjoint and excess genes are inherited from the more fit parent, or if they are equally fit,
+ * each gene is inherited from either parent randomly.
+ * Disabled genes have a chance of being reenabled during crossover,
+ * allowing networks to make use of older genes once again.
+ */
 export const crossGenomes = (
 	genome1: Genome,
 	genome2: Genome,
 	config: Config
 ) => {
-	/*
-    Disjoint and excess genes are inherited from the more fit parent, or if they are equally fit, 
-    each gene is inherited from either parent randomly. 
-    Disabled genes have a chance of being reenabled during crossover,
-    allowing networks to make use of older genes once again.
-    */
-
 	const equalFitness = genome2.adjustedFitness === genome1.adjustedFitness
 
 	// Make sure that genome 1 is the fitter genome
@@ -182,38 +180,66 @@ export const crossGenomes = (
 
 		// Handle any excess genes
 		if (g2 >= genome2Length) {
-			newGenes.push(config.nnPlugin.cloneGene(gene1) as ConnectionGene)
+			const newGene = config.nnPlugin.cloneGene(gene1) as ConnectionGene
+
+			// Reenable a potentially disabled gene
+			if (random(config.reenableConnectionProbability))
+				newGene.enabled = true
+
+			newGenes.push()
 			g1++
 		}
 		// Store weight delta when there are matching genes
 		else if (gene1.innovationNumber === gene2.innovationNumber) {
+			// Store the crossed over gene
+			let newGene
+
 			if (random(config.mateByChoosingProbability)) {
 				// Choose one of the genes to add to the new genome
-				newGenes.push(
-					config.nnPlugin.cloneGene(
-						Math.random() < 0.5 ? gene1 : gene2
-					) as ConnectionGene
-				)
+				newGene = config.nnPlugin.cloneGene(
+					Math.random() < 0.5 ? gene1 : gene2
+				) as ConnectionGene
 			} else {
 				// Add the averaged connection to the new genome
-				newGenes.push(
-					config.nnPlugin.averageGenes(gene1, gene2) as ConnectionGene
-				)
+				newGene = config.nnPlugin.averageGenes(
+					gene1,
+					gene2
+				) as ConnectionGene
 			}
+
+			// Reenable a potentially disabled gene
+			if (random(config.reenableConnectionProbability))
+				newGene.enabled = true
+
+			newGenes.push(newGene)
 
 			g1++
 			g2++
 		}
 		// Directly insert any disjoint connections from the fitter genome
 		else if (gene1.innovationNumber > gene2.innovationNumber) {
-			newGenes.push(config.nnPlugin.cloneGene(gene1) as ConnectionGene)
+			const newGene = config.nnPlugin.cloneGene(gene1) as ConnectionGene
+
+			// Reenable a potentially disabled gene
+			if (random(config.reenableConnectionProbability))
+				newGene.enabled = true
+
+			newGenes.push(newGene)
+
 			g1++ // Avoid cloning the same gene twice
 			g2++
 		} else if (gene1.innovationNumber < gene2.innovationNumber) {
 			if (equalFitness) {
-				newGenes.push(
-					config.nnPlugin.cloneGene(gene2) as ConnectionGene
-				)
+				const newGene = config.nnPlugin.cloneGene(
+					gene2
+				) as ConnectionGene
+
+				// Reenable a potentially disabled gene
+				if (random(config.reenableConnectionProbability))
+					newGene.enabled = true
+
+				newGenes.push(newGene)
+
 				g2++ // Avoid cloning the same gene twice
 			}
 			g1++

@@ -52,6 +52,14 @@ const TinyNEAT = (partialConfig: PartialConfig = {}) => {
 	const complete = () => generation >= config.maxGenerations
 
 	const evolve = () => {
+		// Modify the fitness depending on the fitness strategy
+		switch (config.fitnessSort) {
+			case "max":
+				break
+			case "min":
+				population.forEach((genome) => (genome.fitness *= -1))
+		}
+
 		// Update the hall of fame
 		population.forEach((genome) => hallOfFame.tryAdding(genome))
 

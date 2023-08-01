@@ -58,11 +58,17 @@ export const evolvePopulation = (
 		// Create the remaining offspring for the next generation
 		for (
 			let offspring = 0;
-			offspring < offspringAllocation[i] - 1;
+			offspring <
+			Math.max(offspringAllocation[i] - 1, config.minimumSpeciesSize);
 			offspring++
 		) {
 			const parent1: Genome = chooseRandom(viableParents)
-			const parent2: Genome = chooseRandom(viableParents)
+			let parent2: Genome = chooseRandom(viableParents)
+
+			// In rare cases, allow interspecies crossover
+			if (random(config.interspeciesMatingRate)) {
+				parent2 = chooseRandom(chooseRandom(species))
+			}
 
 			let childGenes: ConnectionGene[]
 

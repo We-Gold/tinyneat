@@ -92,6 +92,7 @@ The following is the default configuration of TinyNEAT. For any changes, for exa
 export const defaultConfig = {
 	initialPopulationSize: 150, // Number of networks in the population
 	maxGenerations: 100, // Stopping point for evolution
+
 	maximumStagnation: 15, // Maximum number of generations a species is allowed to stay the same fitness before it is removed
 	excessCoefficient: 1.0, // Coefficient representing how important excess genes are in measuring compatibility
 	disjointCoefficient: 1.0, // Coefficient for disjoint genes
@@ -103,11 +104,15 @@ export const defaultConfig = {
 	addNodeProbability: 0.03, // Probability a new node gene will be added to the genome
 	addLinkProbability: 0.05, // Probability a new connection will be added
 	mutateWeightProbability: 0.3, // Probability a weight will be mutated
-	interspeciesMatingRate: 0.001, // Percentage of crossovers allowed to occur between parents of different species
+	interspeciesMatingRate: 0.01, // Percentage of crossovers allowed to occur between parents of different species
 	mateByChoosingProbability: 0.6, // Probability that genes will be chosen one at a time from either parent during crossover
 	mateByAveragingProbability: 0.4, // Probability that matching genes will be averaged during crossover
+	reenableConnectionProbability: 0.01, // Probability that a connection is randomly reenabled during crossover
 
-	minimumSpeciesSize: 3, // The minimum number of offspring a species can have
+	fitnessSort: "max", // Whether a higher or a lower fitness is better
+
+	largeNetworkSize: 20, // A network with this many genes is considered to be large
+	minimumSpeciesSize: 2, // The minimum number of offspring a species can have
 
 	hallOfFameSize: 10, // The number of top-performing individuals to store
 
@@ -118,7 +123,7 @@ export const defaultConfig = {
 	nnPlugin: ANNPlugin(),
 
 	// Plugins for logging data
-	loggingPlugins: <Logger[]>[ConsoleLogger()],
+	loggingPlugins: [ConsoleLogger()],
 }
 ```
 
