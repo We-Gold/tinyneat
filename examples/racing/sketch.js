@@ -24,7 +24,7 @@ const tn = TinyNEAT({
 	initialPopulationSize: POPULATION_SIZE,
 	inputSize: 16,
 	outputSize: 1,
-	compatibilityThreshold: 2.0,
+	compatibilityThreshold: 6.0,
 	addLinkProbability: 0.1,
 	addNodeProbability: 0.2,
 	mutateWeightProbability: 0.4,

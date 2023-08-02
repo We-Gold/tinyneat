@@ -120,14 +120,16 @@ The following is the default configuration of TinyNEAT. For any changes, for exa
 ```js
 // Closely based on parameters of the original NEAT paper
 export const defaultConfig = {
-	initialPopulationSize: 150, // Number of networks in the population
+	initialPopulationSize: 50, // Number of networks in the population
+	targetSpecies: 10, // Desired number of species to maintain
 	maxGenerations: 100, // Stopping point for evolution
 
 	maximumStagnation: 15, // Maximum number of generations a species is allowed to stay the same fitness before it is removed
-	excessCoefficient: 1.0, // Coefficient representing how important excess genes are in measuring compatibility
-	disjointCoefficient: 1.0, // Coefficient for disjoint genes
-	weightDifferenceCoefficient: 0.4, // Coefficient for average weight difference (highly recommended for tuning)
-	compatibilityThreshold: 3.0, // Threshold for speciation (highly recommended for tuning)
+	excessCoefficient: 2.0, // Coefficient representing how important excess genes are in measuring compatibility
+	disjointCoefficient: 2.0, // Coefficient for disjoint genes
+	weightDifferenceCoefficient: 1.0, // Coefficient for average weight difference (highly recommended for tuning)
+	compatibilityThreshold: 6.0, // Threshold for speciation (highly recommended for tuning)
+	compatibilityModifier: 0.3, // Rate to change the compatibility threshold at when target species count is not met
 	survivalThreshold: 0.2, // Percentage of each species allowed to reproduce
 	mutateOnlyProbability: 0.25, // Probability that a reproduction will only result from mutation and not crossover
 	mateOnlyProbability: 0.2, // Probability an offspring will be created only through crossover without mutation
@@ -139,15 +141,15 @@ export const defaultConfig = {
 	mateByAveragingProbability: 0.4, // Probability that matching genes will be averaged during crossover
 	reenableConnectionProbability: 0.01, // Probability that a connection is randomly reenabled during crossover
 
-	fitnessSort: "max", // Whether a higher or a lower fitness is better
+	fitnessSort: "max",
 
 	largeNetworkSize: 20, // A network with this many genes is considered to be large
-	minimumSpeciesSize: 2, // The minimum number of offspring a species can have
+	minimumSpeciesSize: 1, // The minimum number of offspring a species can have
 
 	hallOfFameSize: 10, // The number of top-performing individuals to store
 
-	inputSize: 3, // The number of inputs to each neural network
-	outputSize: 2, // The number of outputs of each neural network
+	inputSize: 1, // The number of inputs to each neural network
+	outputSize: 1, // The number of outputs of each neural network
 
 	// Plugin for the specific type of neural network (ANN, RNN, etc)
 	nnPlugin: ANNPlugin(),

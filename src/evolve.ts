@@ -21,6 +21,9 @@ export const evolvePopulation = (
 	// Separate the current population into species
 	speciatePopulation(population, species, config)
 
+	// Adjust the compatibility threshold based on the number of species
+	adjustCompatibilityThreshold(species, config)
+
 	// Adjust the fitness of each organism to normalize based on species size
 	calculateAdjustedFitnesses(species)
 
@@ -159,4 +162,17 @@ const allocateOffspring = (population: Genome[], species: Genome[][]) => {
 	return speciesFitnessAverages.map(averageFitness =>
 		Math.round((averageFitness / totalAverageFitness) * population.length),
 	)
+}
+
+const adjustCompatibilityThreshold = (species: Genome[][], config: Config) => {
+	// Modify the compatibility threshold to dynamically control the number of species
+	if (species.length < config.targetSpecies) {
+		config.compatibilityThreshold -= config.compatibilityModifier
+	} else if (species.length > config.targetSpecies) {
+		config.compatibilityThreshold += config.compatibilityModifier
+	}
+
+	// Prevent the compatibility threshold from getting too small
+	if (config.compatibilityThreshold < config.compatibilityModifier)
+		config.compatibilityThreshold = config.compatibilityModifier
 }
