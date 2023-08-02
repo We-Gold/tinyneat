@@ -81,6 +81,10 @@ for (let step = 0; step < maxGenerationSteps; step++) {
 console.log(`Best fitness: ${tn.getBestGenomes()[0].fitness}`)
 ```
 
+## NEAT Demos
+
+[Racing](https://wegold.me/tinyneat/examples/racing/): An adaptation of a very old project of mine that trains agents to drive around race tracks.
+
 ## Environment Recommendations
 
 Environments are not managed by TinyNEAT. We do recommend one of two environment structures. One, is an OpenAI gym-type environment, where each agent has their own environment. The other is an environment that manages each agent individually inside a single environment.
