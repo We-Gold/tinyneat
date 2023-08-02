@@ -30,6 +30,24 @@ The goal is that this library is able to fit into any particular use case, and t
 
 ## Basic Example
 
+### Installation
+
+```bash
+npm i tinyneat
+```
+
+or
+
+```html
+<!-- Import using CDN, no types included -->
+<script
+	type="module"
+	src="https://cdn.jsdelivr.net/npm/tinyneat/dist/index.js"
+></script>
+```
+
+### Example Usage (inspired by OpenAI gym)
+
 ```js
 import { TinyNEAT } from "tinyneat"
 
