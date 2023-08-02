@@ -1,4 +1,4 @@
-name: Build Docs with TypeDoc
+name: Build Website with TypeDoc and Examples
 on:
     release:
         types: [created]
@@ -13,9 +13,21 @@ jobs:
               with:
                   node-version: 18
             - run: npm ci
-            - run: npm run docs
+
+            - name: Build Docs
+              run: npm run docs
+            - name: Create Public Folder
+              run: |
+                  mkdir public
+                  mkdir public/docs
+                  mkdir public/examples
+            - name: Copy Docs to Public
+              run: mv docs/* public/docs
+            - name: Copy Examples to Public
+              run: mv examples/* public/examples
+
             - name: Deploy to GitHub Pages
               uses: peaceiris/actions-gh-pages@v3
               with:
                   github_token: ${{ secrets.GITHUB_TOKEN }}
-                  publish_dir: ./docs
+                  publish_dir: ./public

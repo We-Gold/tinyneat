@@ -14,9 +14,9 @@ _[Skip To Documentation](#documentation)_
 
 #### Motivation
 
-With many websites and web-based games being written in JavaScript, having a solid starting place for using NEAT to train AI agents only makes sense.
+With many websites and web-based games being written in JavaScript, having a solid starting place for using NEAT to train AI agents seems pretty useful.
 
-Our goal is that this library is able to fit into any particular use case, and that the implementation of the environment is entirely up to the user.
+The goal is that this library is able to fit into any particular use case, and that the implementation of the environment is entirely up to the user.
 
 #### Features
 
@@ -89,7 +89,7 @@ Environments are expected to iterate automatically, manage agents, and calculate
 
 ## Documentation
 
-See our reference documentation [here](#).
+See our reference documentation [here](https://wegold.me/tinyneat/docs).
 
 ### Configuration
 
