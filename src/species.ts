@@ -8,7 +8,7 @@ import { Genome, calculateGenomeDistance } from "./genome"
 export const speciatePopulation = (
 	population: Genome[],
 	species: Genome[][],
-	config: Config
+	config: Config,
 ) => {
 	// Remove all genomes from the previous geneation besides the
 	// representative for each species
@@ -18,7 +18,7 @@ export const speciatePopulation = (
 
 	// Create another array to track the closest representatives for
 	// each species from the next generation
-	const nextRepresentative = species.map((_) => ({
+	const nextRepresentative = species.map(() => ({
 		distance: Infinity,
 		i: 0,
 	}))
@@ -31,10 +31,7 @@ export const speciatePopulation = (
 			const distanceBetweenGenomes = calculateGenomeDistance(
 				s[0],
 				genome,
-				config.excessCoefficient,
-				config.disjointCoefficient,
-				config.weightDifferenceCoefficient,
-				config
+				config,
 			)
 
 			// Add the genome to the appropriate species and track the closest
@@ -71,4 +68,3 @@ export const speciatePopulation = (
 		s[0] = s.splice(nextRepresentative[index].i, 1)[0]
 	}
 }
-

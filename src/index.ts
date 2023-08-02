@@ -22,7 +22,7 @@ const TinyNEAT = (partialConfig: PartialConfig = {}) => {
 	let population: Genome[] = Array(config.initialPopulationSize)
 
 	// Create a list for storing species
-	let species: Genome[][] = []
+	const species: Genome[][] = []
 
 	// Create a list to store innovations (key is the pair of nodes)
 	const innovationHistory = createInnovationHistory()
@@ -57,17 +57,17 @@ const TinyNEAT = (partialConfig: PartialConfig = {}) => {
 			case "max":
 				break
 			case "min":
-				population.forEach((genome) => (genome.fitness *= -1))
+				population.forEach(genome => (genome.fitness *= -1))
 		}
 
 		// Update the hall of fame
-		population.forEach((genome) => hallOfFame.tryAdding(genome))
+		population.forEach(genome => hallOfFame.tryAdding(genome))
 
 		population = evolvePopulation(
 			population,
 			species,
 			innovationHistory,
-			config
+			config,
 		)
 
 		generation++
@@ -94,4 +94,3 @@ const TinyNEAT = (partialConfig: PartialConfig = {}) => {
 }
 
 export { TinyNEAT, plugins }
-

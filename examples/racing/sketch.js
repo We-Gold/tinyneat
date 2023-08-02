@@ -1,14 +1,14 @@
 import p5 from "./p5.js"
 import { Car } from "./src/car"
 import { SensorDisplay } from "./src/sensor_display"
-import {TinyNEAT, plugins} from "./node_modules/tinyneat"
+import { TinyNEAT, plugins } from "./node_modules/tinyneat"
 
 let bg
 let cars
 let sensorDisplay
 let w = 600
 let h = 400
-let training = false
+// let training = false
 
 const POPULATION_SIZE = 200
 const MAX_STEPS = 400
@@ -24,10 +24,10 @@ const tn = TinyNEAT({
 	initialPopulationSize: POPULATION_SIZE,
 	inputSize: 16,
 	outputSize: 1,
-    compatibilityThreshold: 2.0,
-    addLinkProbability: 0.1,
-    addNodeProbability: 0.2,
-    mutateWeightProbability: 0.4,
+	compatibilityThreshold: 2.0,
+	addLinkProbability: 0.1,
+	addNodeProbability: 0.2,
+	mutateWeightProbability: 0.4,
 	nnPlugin: plugins.ANNPlugin({ activation: "posAndNegSigmoid" }),
 })
 
@@ -43,7 +43,10 @@ function setup(p) {
 	p.pixelDensity(1)
 
 	// Create initial car population
-	cars = Array.from(Array(POPULATION_SIZE), () => new Car(p, 50, 200, INITIAL_ANGLE))
+	cars = Array.from(
+		Array(POPULATION_SIZE),
+		() => new Car(p, 50, 200, INITIAL_ANGLE),
+	)
 
 	sensorDisplay = new SensorDisplay(p, 20, 20)
 }
@@ -61,25 +64,24 @@ function draw(p) {
 		// Create new cars for the new population
 		cars = Array.from(
 			Array(tn.getPopulation().length),
-			() => new Car(p, 50, 200, INITIAL_ANGLE)
+			() => new Car(p, 50, 200, INITIAL_ANGLE),
 		)
 
-        if (tn.complete())
-            p.noLoop()
+		if (tn.complete()) p.noLoop()
 	}
 
 	const population = tn.getPopulation()
 
 	for (const [i, car] of cars.entries()) {
-        // Skip any cars that leave the track fully
-        if (car.isOffTrack()) {
-            continue
-        }
+		// Skip any cars that leave the track fully
+		if (car.isOffTrack()) {
+			continue
+		}
 
 		car.move()
 		car.sense()
 
-        const outputs = population[i].process(car.getInputs())
+		const outputs = population[i].process(car.getInputs())
 
 		population[i].fitness += car.receiveOutput(outputs[0])
 
@@ -128,12 +130,11 @@ function draw(p) {
 	// }
 }
 
-const sketch = (p) => {
+const sketch = p => {
 	// Initialize the setup and draw methods
 	p.setup = () => setup(p)
 	p.draw = () => draw(p)
 	p.preload = () => preload(p)
 }
 
-const P5 = new p5(sketch)
-
+new p5(sketch)

@@ -9,7 +9,7 @@ const ConsoleLogger = (): Logger => {
 		console.log(`Beginning NEAT`)
 		console.log(`______________`)
 		console.log(
-			`Initial Population Size: ${data.config.initialPopulationSize}`
+			`Initial Population Size: ${data.config.initialPopulationSize}`,
 		)
 		console.log(`Complete Config: `)
 		console.log(data.config)
@@ -37,4 +37,3 @@ const ConsoleLogger = (): Logger => {
 }
 
 export default ConsoleLogger
-

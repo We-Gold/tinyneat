@@ -11,7 +11,7 @@ const createANNNetwork = (
 	inputSize: number,
 	outputSize: number,
 	genes: ConnectionGene[],
-	activation: (x: number) => number
+	activation: (x: number) => number,
 ) => {
 	// Create a map between connections and weights
 	const weights: { [key: string]: number } = {}
@@ -29,7 +29,7 @@ const createANNNetwork = (
 
 	if (topoSorted.length === 0) {
 		throw new Error(
-			"Received an unexpected graph structure, make sure the ANN is configured correctly."
+			"Received an unexpected graph structure, make sure the ANN is configured correctly.",
 		)
 	}
 
@@ -37,7 +37,7 @@ const createANNNetwork = (
 		// Verify that the input shape is correct
 		if (inputs.length !== inputSize)
 			throw new Error(
-				`Received inputs of length ${inputs.length}, but expected length ${inputSize}`
+				`Received inputs of length ${inputs.length}, but expected length ${inputSize}`,
 			)
 
 		const nodeValues = Array(genes.length).fill(0)
@@ -80,7 +80,7 @@ const createANNNetwork = (
 
 const calculateGeneDistance = (
 	gene1: ConnectionGene,
-	gene2: ConnectionGene
+	gene2: ConnectionGene,
 ) => {
 	return (
 		(gene1 as ANNConnectionGene).weight -
@@ -114,7 +114,7 @@ const configureNewGene = (gene: ConnectionGene) => {
 
 const configureCloneGene = (
 	gene: ConnectionGene,
-	originalGene: ConnectionGene
+	originalGene: ConnectionGene,
 ) => {
 	return { ...gene, weight: (originalGene as ANNConnectionGene).weight }
 }
@@ -131,7 +131,7 @@ const defaultConfig: {
 
 // Create the standard Artificial Neural Network plugin
 const ANNPlugin = (
-	partialConfig: Partial<typeof defaultConfig> = {}
+	partialConfig: Partial<typeof defaultConfig> = {},
 ): NNPlugin => {
 	// Fill in any missing details from the config using defaults
 	const config: typeof defaultConfig = { ...defaultConfig, ...partialConfig }
@@ -140,13 +140,13 @@ const ANNPlugin = (
 		createNetwork: (
 			inputSize: number,
 			outputSize: number,
-			genes: ConnectionGene[]
+			genes: ConnectionGene[],
 		) =>
 			createANNNetwork(
 				inputSize,
 				outputSize,
 				genes,
-				Activation[config.activation]
+				Activation[config.activation],
 			),
 		calculateGeneDistance,
 		mutateGeneWeight: (gene: ConnectionGene) =>
@@ -161,4 +161,3 @@ const ANNPlugin = (
 }
 
 export default ANNPlugin
-

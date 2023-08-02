@@ -23,7 +23,7 @@ export interface Genome {
 
 export const createEmptyGenome = (
 	innovationHistory: InnovationHistory,
-	config: Config
+	config: Config,
 ) => {
 	// Genes are indexed in the flattened form of: [inputs, outputs, hidden]
 	const genes: ConnectionGene[] = []
@@ -39,7 +39,7 @@ export const createEmptyGenome = (
 					connection,
 					enabled: true,
 					innovationNumber,
-				}) as ConnectionGene
+				}) as ConnectionGene,
 			)
 		}
 	}
@@ -53,18 +53,18 @@ export const createEmptyGenome = (
 export const createGenomeFromGenes = (
 	genes: ConnectionGene[],
 	maxGeneIndex: number,
-	config: Config
+	config: Config,
 ) => {
 	// Validate the neural network size
 	if (config.inputSize < 1 || config.outputSize < 1)
 		throw new Error(
-			"Invalid neural network input or output size. Verify that there are at least 1 of each."
+			"Invalid neural network input or output size. Verify that there are at least 1 of each.",
 		)
 
 	const neuralNetwork = config.nnPlugin.createNetwork(
 		config.inputSize,
 		config.outputSize,
-		genes
+		genes,
 	)
 
 	return {
@@ -79,10 +79,7 @@ export const createGenomeFromGenes = (
 export const calculateGenomeDistance = (
 	genome1: Genome,
 	genome2: Genome,
-	excessCoefficient: number,
-	disjointCoefficient: number,
-	weightDifferenceCoefficient: number,
-	config: Config
+	config: Config,
 ) => {
 	// Make sure that genome 1 is the larger genome
 	if (genome2.genes.length > genome1.genes.length) {
@@ -93,7 +90,7 @@ export const calculateGenomeDistance = (
 	const genome2Length = genome2.genes.length
 
 	// Create trackers for each of the factors in genome distance
-	let excess = genome1Length - genome2Length
+	const excess = genome1Length - genome2Length
 	let disjoint = 0
 	let weightDelta = 0
 
@@ -115,7 +112,7 @@ export const calculateGenomeDistance = (
 		) {
 			weightDelta += config.nnPlugin.calculateGeneDistance(
 				genome1.genes[g1++],
-				genome1.genes[g2++]
+				genome1.genes[g2++],
 			)
 			weightsCompared++
 		}
@@ -136,9 +133,9 @@ export const calculateGenomeDistance = (
 	}
 
 	return (
-		(excessCoefficient * excess) / N +
-		(disjointCoefficient * disjoint) / N +
-		weightDifferenceCoefficient * (weightDelta / weightsCompared)
+		(config.excessCoefficient * excess) / N +
+		(config.disjointCoefficient * disjoint) / N +
+		config.weightDifferenceCoefficient * (weightDelta / weightsCompared)
 	)
 }
 
@@ -151,7 +148,7 @@ export const calculateGenomeDistance = (
 export const crossGenomes = (
 	genome1: Genome,
 	genome2: Genome,
-	config: Config
+	config: Config,
 ) => {
 	const equalFitness = genome2.adjustedFitness === genome1.adjustedFitness
 
@@ -197,13 +194,13 @@ export const crossGenomes = (
 			if (random(config.mateByChoosingProbability)) {
 				// Choose one of the genes to add to the new genome
 				newGene = config.nnPlugin.cloneGene(
-					Math.random() < 0.5 ? gene1 : gene2
+					Math.random() < 0.5 ? gene1 : gene2,
 				) as ConnectionGene
 			} else {
 				// Add the averaged connection to the new genome
 				newGene = config.nnPlugin.averageGenes(
 					gene1,
-					gene2
+					gene2,
 				) as ConnectionGene
 			}
 
@@ -231,7 +228,7 @@ export const crossGenomes = (
 		} else if (gene1.innovationNumber < gene2.innovationNumber) {
 			if (equalFitness) {
 				const newGene = config.nnPlugin.cloneGene(
-					gene2
+					gene2,
 				) as ConnectionGene
 
 				// Reenable a potentially disabled gene
@@ -256,12 +253,12 @@ export const mutateAddConnection = (
 	maxGeneIndex: number,
 	inputSize: number,
 	outputSize: number,
-	config: Config
+	config: Config,
 ) => {
 	// Create a list of indices corresponding to topoSorted
 	const topoSortedIndices = Array.from(
 		{ length: maxGeneIndex + 1 },
-		(_, i) => i
+		(_, i) => i,
 	)
 
 	// Make sure that the input is not an output node
@@ -280,11 +277,9 @@ export const mutateAddConnection = (
 	if (inputIndex === outputIndex) return
 
 	// Make sure the connection is in order
-	const actualInputIndex = topoSorted.findIndex(
-		(value) => value === inputIndex
-	)
+	const actualInputIndex = topoSorted.findIndex(value => value === inputIndex)
 	const actualOutputIndex = topoSorted.findIndex(
-		(value) => value === outputIndex
+		value => value === outputIndex,
 	)
 
 	if (actualInputIndex > actualOutputIndex) {
@@ -292,9 +287,9 @@ export const mutateAddConnection = (
 	}
 
 	const existingConnection = genes.find(
-		(gene) =>
+		gene =>
 			gene.connection[0] === inputIndex &&
-			gene.connection[1] === outputIndex
+			gene.connection[1] === outputIndex,
 	)
 
 	// Enable the connection if it already exists
@@ -312,7 +307,7 @@ export const mutateAddConnection = (
 			connection,
 			enabled: true,
 			innovationNumber,
-		}) as ConnectionGene
+		}) as ConnectionGene,
 	)
 }
 
@@ -320,7 +315,7 @@ export const mutateAddNode = (
 	genes: ConnectionGene[],
 	innovationHistory: InnovationHistory,
 	maxGeneIndex: number,
-	config: Config
+	config: Config,
 ) => {
 	const connectionGene: ConnectionGene = chooseRandom(genes)
 
@@ -344,7 +339,7 @@ export const mutateAddNode = (
 			connection: inputConnection,
 			enabled: true,
 			innovationNumber: innovationHistory.getInnovation(inputConnection),
-		}) as ConnectionGene
+		}) as ConnectionGene,
 	)
 
 	genes.push(
@@ -355,10 +350,9 @@ export const mutateAddNode = (
 				innovationNumber:
 					innovationHistory.getInnovation(outputConnection),
 			},
-			connectionGene
-		) as ConnectionGene
+			connectionGene,
+		) as ConnectionGene,
 	)
 
 	return newNodeId
 }
-

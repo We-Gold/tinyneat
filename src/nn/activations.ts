@@ -28,4 +28,3 @@ export const Activation: Record<ActivationType, (x: number) => number> = {
 	relu,
 	posAndNegSigmoid,
 }
-

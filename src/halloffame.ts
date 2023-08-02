@@ -14,7 +14,7 @@ export const createHallOfFame = (size: number) => {
 
 		// Find the appropriate spot for this contestant in the hall of fame
 		const index = bestGenomes.findIndex(
-			(element) => element && element.fitness <= contestant.fitness
+			element => element && element.fitness <= contestant.fitness,
 		)
 
 		if (index === -1) {
@@ -39,4 +39,3 @@ export const createHallOfFame = (size: number) => {
 
 	return { tryAdding, getBestGenomes }
 }
-

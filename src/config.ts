@@ -43,4 +43,3 @@ export const defaultConfig = {
 
 export type Config = typeof defaultConfig
 export type PartialConfig = Partial<Config>
-

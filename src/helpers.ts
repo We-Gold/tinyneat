@@ -7,12 +7,13 @@ export const random = (probability: number) => Math.random() <= probability
 /**
  * Choose and return a random element of a given array.
  */
-export const chooseRandom = (array: any[]) => array[chooseRandomIndex(array)]
+export const chooseRandom = <Type>(array: Type[]) =>
+	array[chooseRandomIndex(array)]
 
 /**
  * Choose and return a random index of a given array.
  */
-export const chooseRandomIndex = (array: any[]) =>
+export const chooseRandomIndex = <Type>(array: Type[]) =>
 	Math.round(Math.random() * (array.length - 1))
 
 /**
@@ -21,4 +22,3 @@ export const chooseRandomIndex = (array: any[]) =>
  */
 export const uniformRandomWeight = (magnitude: number) =>
 	(2 * Math.random() - 1) * magnitude
-

@@ -4,7 +4,7 @@ import { ConnectionGene } from "../genome"
  * Defines the interface for any neural network plugin.
  * Each method is required. See ann.ts for an example.
  *
- * Note: All methods that return {} actually return
+ * Note: All methods that return object actually return
  * a type that extends ConnectionGene, with any plugin-specific
  * data.
  */
@@ -12,21 +12,21 @@ export interface NNPlugin {
 	createNetwork: (
 		inputSize: number,
 		outputSize: number,
-		genes: ConnectionGene[]
+		genes: ConnectionGene[],
 	) => { process: (inputs: number[]) => number[] }
 	calculateGeneDistance: (
 		gene1: ConnectionGene,
-		gene2: ConnectionGene
+		gene2: ConnectionGene,
 	) => number
 	mutateGeneWeight: (gene: ConnectionGene) => void
-	cloneGene: (gene: ConnectionGene) => {}
-	averageGenes: (gene1: ConnectionGene, gene2: ConnectionGene) => {}
-	configureRandomGene: (gene: ConnectionGene) => {}
-	configureNewGene: (gene: ConnectionGene) => {}
+	cloneGene: (gene: ConnectionGene) => object
+	averageGenes: (gene1: ConnectionGene, gene2: ConnectionGene) => object
+	configureRandomGene: (gene: ConnectionGene) => object
+	configureNewGene: (gene: ConnectionGene) => object
 	configureCloneGene: (
 		gene: ConnectionGene,
-		originalGene: ConnectionGene
-	) => {}
+		originalGene: ConnectionGene,
+	) => object
 }
 
 /**
@@ -65,7 +65,7 @@ export const createAdjacencyList = (genes: ConnectionGene[]) => {
  */
 export const topologicalSort = (
 	inputToOutput: { [key: number]: number[] },
-	outputToInput: { [key: number]: number[] }
+	outputToInput: { [key: number]: number[] },
 ) => {
 	// Store the number of connections into each node
 	const inDegrees: { [key: number]: number } = {}
@@ -105,4 +105,3 @@ export const topologicalSort = (
 		? topologicalOrdering
 		: []
 }
-

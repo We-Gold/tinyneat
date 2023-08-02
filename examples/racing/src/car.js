@@ -37,7 +37,7 @@ export class Car {
 	getPointAtDistance(dist, angle) {
 		const pos = p5.Vector.fromAngle(
 			this.dir.heading() + this.p.radians(angle),
-			dist
+			dist,
 		)
 
 		const x = this.x + pos.x
@@ -64,18 +64,22 @@ export class Car {
 	isOffTrack() {
 		const offTrackIndex = 0
 
-		const frontLeftOffTrack = this.classifySensorInts(
-			this.getPointAtDistance(DIST_TO_CORNER, ANGLE_TO_CORNER)
-		) === offTrackIndex
-		const frontRightOffTrack = this.classifySensorInts(
-			this.getPointAtDistance(DIST_TO_CORNER, -ANGLE_TO_CORNER)
-		) === offTrackIndex
-		const backLeftOffTrack = this.classifySensorInts(
-			this.getPointAtDistance(-DIST_TO_CORNER, -ANGLE_TO_CORNER)
-		) === offTrackIndex
-		const backRightOffTrack = this.classifySensorInts(
-			this.getPointAtDistance(-DIST_TO_CORNER, ANGLE_TO_CORNER)
-		) === offTrackIndex
+		const frontLeftOffTrack =
+			this.classifySensorInts(
+				this.getPointAtDistance(DIST_TO_CORNER, ANGLE_TO_CORNER),
+			) === offTrackIndex
+		const frontRightOffTrack =
+			this.classifySensorInts(
+				this.getPointAtDistance(DIST_TO_CORNER, -ANGLE_TO_CORNER),
+			) === offTrackIndex
+		const backLeftOffTrack =
+			this.classifySensorInts(
+				this.getPointAtDistance(-DIST_TO_CORNER, -ANGLE_TO_CORNER),
+			) === offTrackIndex
+		const backRightOffTrack =
+			this.classifySensorInts(
+				this.getPointAtDistance(-DIST_TO_CORNER, ANGLE_TO_CORNER),
+			) === offTrackIndex
 
 		return (
 			frontLeftOffTrack ||
@@ -109,7 +113,7 @@ export class Car {
 
 		let classifiedColor = null
 
-		colorsArr.forEach((color) => {
+		colorsArr.forEach(color => {
 			if (this.p.abs(sensedColor - knownColors[color]) <= offset) {
 				classifiedColor = color
 			}
@@ -126,7 +130,7 @@ export class Car {
 		let classifiedColor = 0
 
 		let i = 0
-		knownColors.forEach((color) => {
+		knownColors.forEach(color => {
 			if (this.p.abs(sensedColor - color) <= offset) {
 				classifiedColor = i
 			}
@@ -138,7 +142,7 @@ export class Car {
 
 	classifySensorsInts(sensors) {
 		let classified = []
-		sensors.forEach((sensor) => {
+		sensors.forEach(sensor => {
 			classified.push(this.classifySensorInts(sensor))
 		})
 		return classified
@@ -146,7 +150,7 @@ export class Car {
 
 	classifySensors(sensors) {
 		let classified = []
-		sensors.forEach((sensor) => {
+		sensors.forEach(sensor => {
 			classified.push(this.classifySensor(sensor))
 		})
 		return classified
@@ -171,7 +175,6 @@ export class Car {
 
 	stayInLane() {
 		let classified = this.classifySensors(this.sensors)
-		let classifiedInts = this.classifySensorsInts(this.sensors)
 
 		let leftDistToBlack = 0
 		let rightDistToBlack = classified.length - 1
@@ -226,7 +229,7 @@ export class Car {
 			CAR_LENGTH / 2 - CAR_LENGTH / 4,
 			-CAR_WIDTH / 2,
 			CAR_LENGTH / 4,
-			CAR_WIDTH
+			CAR_WIDTH,
 		)
 		this.p.pop()
 
@@ -237,4 +240,3 @@ export class Car {
 			this.p.line(this.x, this.y, x, y)
 	}
 }
-

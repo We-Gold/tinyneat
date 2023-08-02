@@ -31,11 +31,10 @@ export interface Logger {
  */
 export const LoggingManager = (loggers: Logger[]): Logger => {
 	const handleInitialPopulation = (data: InitialPopulationData) =>
-		loggers.forEach((logger) => logger.handleInitialPopulation?.(data))
+		loggers.forEach(logger => logger.handleInitialPopulation?.(data))
 
 	const handleEvolve = (data: EvolveData) =>
-		loggers.forEach((logger) => logger.handleEvolve?.(data))
+		loggers.forEach(logger => logger.handleEvolve?.(data))
 
 	return { handleInitialPopulation, handleEvolve }
 }
-

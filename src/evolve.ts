@@ -16,7 +16,7 @@ export const evolvePopulation = (
 	population: Genome[],
 	species: Genome[][],
 	innovationHistory: InnovationHistory,
-	config: Config
+	config: Config,
 ) => {
 	// Separate the current population into species
 	speciatePopulation(population, species, config)
@@ -32,16 +32,16 @@ export const evolvePopulation = (
 	for (const [i, s] of species.entries()) {
 		// Sort the parents in descending order by fitness
 		const sortedParents = s.sort(
-			(a, b) => b.adjustedFitness - a.adjustedFitness // This currently assumes positive fitness is ideal
+			(a, b) => b.adjustedFitness - a.adjustedFitness, // This currently assumes positive fitness is ideal
 		)
 
 		// Choose the top performing species individuals to become parents
-		let viableParents = sortedParents.slice(
+		const viableParents = sortedParents.slice(
 			0,
 			Math.max(
 				s.length * config.survivalThreshold,
-				config.minimumSpeciesSize
-			)
+				config.minimumSpeciesSize,
+			),
 		)
 
 		// Select the most fit member of the species to persist
@@ -51,8 +51,8 @@ export const evolvePopulation = (
 			createGenomeFromGenes(
 				structuredClone(champion.genes),
 				champion.maxGeneIndex,
-				config
-			)
+				config,
+			),
 		)
 
 		// Create the remaining offspring for the next generation
@@ -106,7 +106,7 @@ export const evolvePopulation = (
 						maxGeneIndex,
 						config.inputSize,
 						config.outputSize,
-						config
+						config,
 					)
 				} else if (random(config.addNodeProbability)) {
 					// Adds a new node, so update the gene counter
@@ -114,7 +114,7 @@ export const evolvePopulation = (
 						childGenes,
 						innovationHistory,
 						maxGeneIndex,
-						config
+						config,
 					)
 				}
 
@@ -126,7 +126,7 @@ export const evolvePopulation = (
 			}
 
 			nextPopulation.push(
-				createGenomeFromGenes(childGenes, maxGeneIndex, config)
+				createGenomeFromGenes(childGenes, maxGeneIndex, config),
 			)
 		}
 	}
@@ -145,19 +145,18 @@ const calculateAdjustedFitnesses = (species: Genome[][]) => {
 
 const allocateOffspring = (population: Genome[], species: Genome[][]) => {
 	// Calculate the average fitness of each species
-	const speciesFitnessAverages = species.map((s) => {
+	const speciesFitnessAverages = species.map(s => {
 		return s.reduce((acc, curr) => acc + curr.adjustedFitness, 0) / s.length
 	})
 
 	// Sum all of the species average fitnesses
 	const totalAverageFitness = speciesFitnessAverages.reduce(
 		(acc, curr) => acc + curr,
-		0
+		0,
 	)
 
 	// Calculate the proportion of the population to allocate to each species
-	return speciesFitnessAverages.map((averageFitness) =>
-		Math.round((averageFitness / totalAverageFitness) * population.length)
+	return speciesFitnessAverages.map(averageFitness =>
+		Math.round((averageFitness / totalAverageFitness) * population.length),
 	)
 }
-

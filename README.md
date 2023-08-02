@@ -1,7 +1,7 @@
 ![GitHub package.json version (branch)](https://img.shields.io/github/package-json/v/We-Gold/tinyneat/main?label=npm%20version&color=green&link=https%3A%2F%2Fwww.npmjs.com%2Fpackage%2Ftinyneat)
 ![npm bundle size](https://img.shields.io/bundlephobia/min/tinyneat?color=green)
 [![contributions welcome](https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat)](https://github.com/We-Gold/tinyneat/issues)
-![tests](https://github.com/We-Gold/tinyneat/actions/workflows/run-tests.yaml/badge.svg)
+![CI](https://github.com/We-Gold/tinyneat/actions/workflows/ci.yaml/badge.svg)
 ![ViewCount](https://views.whatilearened.today/views/github/We-Gold/tinyneat.svg)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 ![NPM Downloads](https://img.shields.io/npm/dw/tinyneat)
@@ -175,4 +175,3 @@ If you are interested in contributing to the library, or have public plugin code
 For local installation, simply clone the repository and run `npm i` to install all of the development dependencies.
 
 All scripts are listed in `package.json`.
-
