@@ -21,10 +21,13 @@ jobs:
                   mkdir public
                   mkdir public/docs
                   mkdir public/examples
+                  mkdir public/dist
             - name: Copy Docs to Public
               run: mv docs/* public/docs
             - name: Copy Examples to Public
               run: mv examples/* public/examples
+            - name: Copy Dist to Public
+              run: mv dist/* public/dist
 
             - name: Deploy to GitHub Pages
               uses: peaceiris/actions-gh-pages@v3

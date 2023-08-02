@@ -2,7 +2,7 @@
 	"name": "tinyneat",
 	"author": "Weaver Goldman <we.goldm@gmail.com>",
 	"description": "TinyNEAT is a tiny, js-native NEAT (NeuroEvolution of Augmenting Topologies) library, meant to easily incorporate into any codebase.",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"type": "module",
 	"license": "MIT",
 	"repository": {
