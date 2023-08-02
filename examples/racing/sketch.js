@@ -1,7 +1,7 @@
 import p5 from "./p5.js"
-import { Car } from "./src/car"
-import { SensorDisplay } from "./src/sensor_display"
-import { TinyNEAT, plugins } from "./node_modules/tinyneat"
+import { Car } from "./src/car.js"
+import { SensorDisplay } from "./src/sensor_display.js"
+import { TinyNEAT, plugins } from "../../dist/index.js"
 
 let bg
 let cars
