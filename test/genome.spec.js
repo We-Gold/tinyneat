@@ -61,11 +61,7 @@ test("Genome distance is calculated correctly for empty genomes", () => {
 	const genome1 = createEmptyGenome(history, config)
 	const genome2 = createEmptyGenome(history, config)
 
-	const distance = calculateGenomeDistance(
-		genome1,
-		genome2,
-		config,
-	)
+	const distance = calculateGenomeDistance(genome1, genome2, config)
 
 	expect(distance).toBe(0)
 })
