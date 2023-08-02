@@ -48,7 +48,6 @@ const TinyNEAT = (partialConfig: PartialConfig = {}) => {
 	const getCurrentGeneration = () => generation
 
 	// Create a method to check if the evolution is complete
-	// TODO find some way to add custom stopping points
 	const complete = () => generation >= config.maxGenerations
 
 	const evolve = () => {
