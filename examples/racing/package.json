@@ -1,0 +1,6 @@
+{
+	"name": "racing",
+	"version": "0.0.0",
+	"description": "A NEAT example adapted from an old project that used Tensorflow.js.",
+	"main": "sketch.js"
+}
