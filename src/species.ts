@@ -2,34 +2,29 @@ import { Config } from "./config"
 import { Genome, calculateGenomeDistance } from "./genome"
 
 /**
- * Speciate the current population. Species are stored as arrays, where the first
- * element is the representative
+ * Speciate the current population. Each species has a permanent
+ * representative, and if no members exist in this population,
+ * the species goes extinct.
  */
 export const speciatePopulation = (
 	population: Genome[],
-	species: Genome[][],
+	previousSpecies: Species[],
 	config: Config,
+	generation: number,
 ) => {
-	// Remove all genomes from the previous geneation besides the
+	// Remove all genomes from the previous generation besides the
 	// representative for each species
-	for (let i = 0; i < species.length; i++) {
-		species[i] = species[i].slice(0, 1)
+	for (let i = 0; i < previousSpecies.length; i++) {
+		previousSpecies[i].population = []
 	}
-
-	// Create another array to track the closest representatives for
-	// each species from the next generation
-	const nextRepresentative = species.map(() => ({
-		distance: Infinity,
-		i: 0,
-	}))
 
 	for (const genome of population) {
 		let placed = false
 
 		// Check all species to see if this matches one
-		for (const [index, s] of species.entries()) {
+		for (const s of previousSpecies) {
 			const distanceBetweenGenomes = calculateGenomeDistance(
-				s[0],
+				s.representative,
 				genome,
 				config,
 			)
@@ -40,31 +35,39 @@ export const speciatePopulation = (
 				distanceBetweenGenomes < config.compatibilityThreshold &&
 				!placed
 			) {
-				s.push(genome)
+				s.population.push(genome)
 
-				// Store this individual if it is the closest to the previous species representative
-				if (distanceBetweenGenomes < nextRepresentative[index].distance)
-					nextRepresentative[index] = {
-						distance: distanceBetweenGenomes,
-						i: s.length - 1,
-					}
+				// Track the record fitness for this species
+				if (genome.fitness > s.recordFitness) {
+					s.recordFitness = genome.fitness
+					s.recordGeneration = generation
+				}
 
 				placed = true
+
+				// Early exit as we have found an appropriate spot for the genome
+				break
 			}
 		}
 
 		// Create a new species if no matches were found
 		if (!placed) {
-			species.push([genome])
-			nextRepresentative.push({
-				distance: Infinity,
-				i: 0,
-			})
+			previousSpecies.push(createSpecies(genome, generation))
 		}
 	}
 
-	// Replace the previous representative with the new one
-	for (const [index, s] of species.entries()) {
-		s[0] = s.splice(nextRepresentative[index].i, 1)[0]
-	}
+	// Persist all species that maintained a population
+	const species = previousSpecies.filter(s => s.population.length > 0)
+
+	return species
 }
+
+const createSpecies = (representative: Genome, generation: number) => ({
+	population: [representative],
+	recordFitness: representative.fitness,
+	recordGeneration: generation,
+	createdGeneration: generation,
+	representative,
+})
+
+export type Species = ReturnType<typeof createSpecies>

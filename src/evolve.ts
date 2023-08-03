@@ -10,31 +10,42 @@ import {
 import { chooseRandom, random } from "./helpers"
 import { InnovationHistory } from "./history"
 import { createAdjacencyList, topologicalSort } from "./nn/nnplugin"
-import { speciatePopulation } from "./species"
+import { Species, speciatePopulation } from "./species"
 
 export const evolvePopulation = (
 	population: Genome[],
-	species: Genome[][],
+	previousSpecies: Species[],
 	innovationHistory: InnovationHistory,
 	config: Config,
+	generation: number,
 ) => {
 	// Separate the current population into species
-	speciatePopulation(population, species, config)
+	const nextSpecies = speciatePopulation(
+		population,
+		previousSpecies,
+		config,
+		generation,
+	)
 
 	// Adjust the compatibility threshold based on the number of species
-	adjustCompatibilityThreshold(species, config)
+	adjustCompatibilityThreshold(nextSpecies, config)
 
 	// Adjust the fitness of each organism to normalize based on species size
-	calculateAdjustedFitnesses(species)
+	calculateAdjustedFitnesses(nextSpecies)
 
 	// Allocate the appropriate number of offspring for each species
-	const offspringAllocation = allocateOffspring(population, species)
+	const offspringAllocation = allocateOffspring(
+		population,
+		nextSpecies,
+		config,
+		generation,
+	)
 
 	const nextPopulation = []
 
-	for (const [i, s] of species.entries()) {
+	for (const [i, s] of nextSpecies.entries()) {
 		// Sort the parents in descending order by fitness
-		const sortedParents = s.sort(
+		const sortedParents = s.population.sort(
 			(a, b) => b.adjustedFitness - a.adjustedFitness, // This currently assumes positive fitness is ideal
 		)
 
@@ -42,7 +53,7 @@ export const evolvePopulation = (
 		const viableParents = sortedParents.slice(
 			0,
 			Math.max(
-				s.length * config.survivalThreshold,
+				s.population.length * config.survivalThreshold,
 				config.minimumSpeciesSize,
 			),
 		)
@@ -70,7 +81,7 @@ export const evolvePopulation = (
 
 			// In rare cases, allow interspecies crossover
 			if (random(config.interspeciesMatingRate)) {
-				parent2 = chooseRandom(chooseRandom(species))
+				parent2 = chooseRandom(chooseRandom(nextSpecies).population)
 			}
 
 			let childGenes: ConnectionGene[]
@@ -134,22 +145,30 @@ export const evolvePopulation = (
 		}
 	}
 
-	return nextPopulation
+	return { nextPopulation, nextSpecies }
 }
 
-const calculateAdjustedFitnesses = (species: Genome[][]) => {
+const calculateAdjustedFitnesses = (species: Species[]) => {
 	// Normalize the fitness of each species by the species size
 	for (const s of species) {
-		for (const genome of s) {
-			genome.adjustedFitness = genome.fitness / s.length
+		for (const genome of s.population) {
+			genome.adjustedFitness = genome.fitness / s.population.length
 		}
 	}
 }
 
-const allocateOffspring = (population: Genome[], species: Genome[][]) => {
+const allocateOffspring = (
+	population: Genome[],
+	species: Species[],
+	config: Config,
+	generation: number,
+) => {
 	// Calculate the average fitness of each species
 	const speciesFitnessAverages = species.map(s => {
-		return s.reduce((acc, curr) => acc + curr.adjustedFitness, 0) / s.length
+		return (
+			s.population.reduce((acc, curr) => acc + curr.adjustedFitness, 0) /
+			s.population.length
+		)
 	})
 
 	// Sum all of the species average fitnesses
@@ -159,12 +178,22 @@ const allocateOffspring = (population: Genome[], species: Genome[][]) => {
 	)
 
 	// Calculate the proportion of the population to allocate to each species
-	return speciesFitnessAverages.map(averageFitness =>
+	const allocatedOffspring = speciesFitnessAverages.map(averageFitness =>
 		Math.round((averageFitness / totalAverageFitness) * population.length),
 	)
+
+	// If the species hasn't improved its fitness in a certain number of generations,
+	// half the number of offspring it is given
+	return allocatedOffspring.map((offspring, index) => {
+		const speciesIsStagnant =
+			generation - species[index].recordGeneration >=
+			config.maximumStagnation
+
+		return speciesIsStagnant ? Math.floor(offspring / 2) : offspring
+	})
 }
 
-const adjustCompatibilityThreshold = (species: Genome[][], config: Config) => {
+const adjustCompatibilityThreshold = (species: Species[], config: Config) => {
 	// Modify the compatibility threshold to dynamically control the number of species
 	if (species.length < config.targetSpecies) {
 		config.compatibilityThreshold -= config.compatibilityModifier

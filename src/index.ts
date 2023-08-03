@@ -4,6 +4,7 @@ import { Genome, createEmptyGenome } from "./genome"
 import { createHallOfFame } from "./halloffame"
 import { createInnovationHistory } from "./history"
 import * as plugins from "./plugins"
+import { Species } from "./species"
 
 /**
  * Creates a NEAT interface using the given configuration.
@@ -22,7 +23,7 @@ const TinyNEAT = (partialConfig: PartialConfig = {}) => {
 	let population: Genome[] = Array(config.initialPopulationSize)
 
 	// Create a list for storing species
-	const species: Genome[][] = []
+	let species: Species[] = []
 
 	// Create a list to store innovations (key is the pair of nodes)
 	const innovationHistory = createInnovationHistory()
@@ -62,12 +63,17 @@ const TinyNEAT = (partialConfig: PartialConfig = {}) => {
 		// Update the hall of fame
 		population.forEach(genome => hallOfFame.tryAdding(genome))
 
-		population = evolvePopulation(
+		const { nextPopulation, nextSpecies } = evolvePopulation(
 			population,
 			species,
 			innovationHistory,
 			config,
+			generation,
 		)
+
+		// Update the population and species
+		population = nextPopulation
+		species = nextSpecies
 
 		generation++
 

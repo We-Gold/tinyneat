@@ -1,5 +1,6 @@
 import { Config } from "../config"
 import { Genome } from "../genome"
+import { Species } from "../species"
 
 export type InitialPopulationData = {
 	population: readonly Genome[]
@@ -9,7 +10,7 @@ export type InitialPopulationData = {
 export type EvolveData = {
 	generation: number
 	population: readonly Genome[]
-	species: readonly Genome[][]
+	species: readonly Species[]
 	bestGenomes: readonly Genome[]
 	config: Config
 	complete: boolean
