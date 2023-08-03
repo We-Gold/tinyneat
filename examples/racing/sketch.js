@@ -9,7 +9,7 @@ let sensorDisplay
 let w = 600
 let h = 400
 
-const POPULATION_SIZE = 100
+const POPULATION_SIZE = 50
 const MAX_STEPS = 400
 
 const FRAME_RATE = 60
@@ -20,17 +20,19 @@ let step = 0
 let shortCircuit = false
 
 const tn = TinyNEAT({
-	maxGenerations: 15,
+	maxGenerations: 50,
+	targetSpecies: 10,
 	initialPopulationSize: POPULATION_SIZE,
 	inputSize: 16,
-	outputSize: 1,
+	outputSize: 2,
 	compatibilityThreshold: 4.5,
 	addLinkProbability: 0.1,
 	addNodeProbability: 0.2,
 	mutateWeightProbability: 0.4,
 	interspeciesMatingRate: 0.01,
-	largeNetworkSize: 30,
-	maximumStagnation: 5,
+	largeNetworkSize: 50,
+	maximumStagnation: 10,
+	mateByChoosingProbability: 0.6,
 	nnPlugin: plugins.ANNPlugin({ activation: "posAndNegSigmoid" }),
 })
 
@@ -90,7 +92,7 @@ function draw(p) {
 
 		const outputs = population[i].process(car.getInputs())
 
-		population[i].fitness += car.receiveOutput(outputs[0])
+		population[i].fitness += car.receiveOutput(outputs)
 
 		car.render()
 	}

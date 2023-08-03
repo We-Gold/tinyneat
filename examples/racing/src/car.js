@@ -11,8 +11,8 @@ const ANGLE_TO_CORNER =
 	(Math.atan(CAR_WIDTH / 2 / (CAR_LENGTH / 2)) * 180) / Math.PI
 const DIST_TO_CORNER = Math.hypot(CAR_WIDTH / 2, CAR_LENGTH / 2)
 
-const ROTATION_RATE = 7 //3
-const CAR_SPEED = 4
+const ROTATION_RATE = 8 // 7
+const CAR_SPEED = 6 // 4
 
 export class Car {
 	constructor(p, x, y, dir) {
@@ -26,6 +26,7 @@ export class Car {
 		this.sensedPoints = []
 		this.inputs = []
 		this.p = p
+		this.speed = CAR_SPEED
 	}
 
 	resetPosition() {
@@ -161,14 +162,14 @@ export class Car {
 		return this.inputs
 	}
 
-	receiveOutput(angle) {
+	receiveOutput([angle, speed]) {
 		this.rotateCar(angle * ROTATION_RATE)
-		// this.rotateCar(angle)
+		this.speed = speed * CAR_SPEED
 
 		// Reward the individual based on the number of black pixels it can see
 		const reward =
 			this.inputs.reduce((acc, curr) => (curr === 1 ? acc + 1 : acc), 0) /
-			this.inputs.length
+			this.inputs.length + this.speed / (2 * CAR_SPEED)
 
 		return reward
 	}
