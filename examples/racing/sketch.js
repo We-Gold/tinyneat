@@ -8,9 +8,8 @@ let cars
 let sensorDisplay
 let w = 600
 let h = 400
-// let training = false
 
-const POPULATION_SIZE = 200
+const POPULATION_SIZE = 100
 const MAX_STEPS = 400
 
 const FRAME_RATE = 60
@@ -18,16 +17,20 @@ const FRAME_RATE = 60
 const INITIAL_ANGLE = -90
 
 let step = 0
+let shortCircuit = false
 
 const tn = TinyNEAT({
-	maxGenerations: 10,
+	maxGenerations: 15,
 	initialPopulationSize: POPULATION_SIZE,
 	inputSize: 16,
 	outputSize: 1,
-	compatibilityThreshold: 2.0,
+	compatibilityThreshold: 4.5,
 	addLinkProbability: 0.1,
 	addNodeProbability: 0.2,
 	mutateWeightProbability: 0.4,
+	interspeciesMatingRate: 0.01,
+	largeNetworkSize: 30,
+	maximumStagnation: 5,
 	nnPlugin: plugins.ANNPlugin({ activation: "posAndNegSigmoid" }),
 })
 
@@ -56,8 +59,9 @@ function draw(p) {
 
 	p.loadPixels()
 
-	if (++step % MAX_STEPS === 0) {
+	if (++step % MAX_STEPS === 0 || shortCircuit) {
 		step = 0
+		shortCircuit = false
 
 		tn.evolve()
 
@@ -72,9 +76,12 @@ function draw(p) {
 
 	const population = tn.getPopulation()
 
+	let carsOffTrack = 0
+
 	for (const [i, car] of cars.entries()) {
 		// Skip any cars that leave the track fully
 		if (car.isOffTrack()) {
+			carsOffTrack++
 			continue
 		}
 
@@ -85,49 +92,17 @@ function draw(p) {
 
 		population[i].fitness += car.receiveOutput(outputs[0])
 
-		// Render every 20th car
-		if (i % 20 === 0) {
-			car.render()
-		}
+		car.render()
 	}
+
+	if (carsOffTrack === cars.length) shortCircuit = true
 
 	// Things to draw on top of the map and car
 	sensorDisplay.showSensors(cars[0].sensors)
 
 	p.textSize(16)
 	p.fill(255)
-	// p.text(`Generation: ${0}`, w - 130, 20)
 	p.text(`FPS: ${Math.round(p.frameRate())}`, w - 130, 20)
-	// textSize(15)
-	// fill(255, 0, 0)
-	// text("Speed: " + car.vel, w - 70, 20)
-
-	// if (!training && !car.modelTrained) {
-	// 	textSize(15)
-	// 	fill(255, 0, 0)
-	// 	text("AI Status: Gathering Data", w - 180, 40)
-	// }
-
-	// if (training && !car.modelTrained) {
-	// 	textSize(15)
-	// 	fill(255, 0, 0)
-	// 	text("AI Status: Training", w - 130, 40)
-	// }
-
-	// if (training && car.modelTrained) {
-	// 	textSize(15)
-	// 	fill(255, 0, 0)
-	// 	text("AI Status: Active", w - 112, 40)
-	// }
-
-	// if (
-	// 	!training &&
-	// 	frameCount % 30 == 0 &&
-	// 	car.memory.mem.length == car.memory.memSize
-	// ) {
-	// training = true
-	// car.initModel()
-	// }
 }
 
 const sketch = p => {

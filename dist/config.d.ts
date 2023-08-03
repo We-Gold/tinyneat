@@ -2,12 +2,14 @@ import { Logger } from "./logging/loggingmanager";
 export type FitnessSort = "max" | "min";
 export declare const defaultConfig: {
     initialPopulationSize: number;
+    targetSpecies: number;
     maxGenerations: number;
     maximumStagnation: number;
     excessCoefficient: number;
     disjointCoefficient: number;
     weightDifferenceCoefficient: number;
     compatibilityThreshold: number;
+    compatibilityModifier: number;
     survivalThreshold: number;
     mutateOnlyProbability: number;
     mateOnlyProbability: number;

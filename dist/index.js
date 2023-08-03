@@ -1,129 +1,133 @@
-const I = (n) => {
+const w = (n) => {
   const e = {}, t = {};
   for (const o of n) {
     if (!o.enabled)
       continue;
-    const [i, s] = o.connection;
-    i in e || (e[i] = []), s in t || (t[s] = []), s in e || (e[s] = []), i in t || (t[i] = []), e[i].push(s), t[s].push(i);
+    const [s, i] = o.connection;
+    s in e || (e[s] = []), i in t || (t[i] = []), i in e || (e[i] = []), s in t || (t[s] = []), e[s].push(i), t[i].push(s);
   }
   return { inputToOutput: e, outputToInput: t };
-}, w = (n, e) => {
+}, I = (n, e) => {
   const t = {};
-  for (const [s, l] of Object.entries(e))
-    t[parseInt(s)] = l.length;
-  const o = Object.entries(e).filter(([, s]) => s.length === 0).map(([s]) => +s), i = [];
+  for (const [i, r] of Object.entries(e))
+    t[parseInt(i)] = r.length;
+  const o = Object.entries(e).filter(([, i]) => i.length === 0).map(([i]) => +i), s = [];
   for (; o.length > 0; ) {
-    const s = o.pop();
-    i.push(s);
-    for (const l of n[s])
-      --t[l] === 0 && o.push(l);
+    const i = o.pop();
+    s.push(i);
+    for (const r of n[i])
+      --t[r] === 0 && o.push(r);
   }
-  return i.length === Object.keys(e).length ? i : [];
-}, z = (n) => 1 / (1 + Math.exp(-n)), F = (n) => 2 / (1 + Math.exp(-n)) - 1, M = (n) => 1 / (1 + Math.exp(-4.9 * n)), E = (n) => Math.tanh(n), R = (n) => n > 0 ? n : 0, C = {
+  return s.length === Object.keys(e).length ? s : [];
+}, z = (n) => 1 / (1 + Math.exp(-n)), T = (n) => 2 / (1 + Math.exp(-n)) - 1, E = (n) => 1 / (1 + Math.exp(-4.9 * n)), k = (n) => Math.tanh(n), R = (n) => n > 0 ? n : 0, C = {
   sigmoid: z,
-  modifiedSigmoid: M,
-  tanh: E,
+  modifiedSigmoid: E,
+  tanh: k,
   relu: R,
-  posAndNegSigmoid: F
-}, g = (n) => Math.random() <= n, v = (n) => n[A(n)], A = (n) => Math.round(Math.random() * (n.length - 1)), N = (n) => (2 * Math.random() - 1) * n, T = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+  posAndNegSigmoid: T
+}, b = (n) => Math.random() <= n, v = (n) => n[A(n)], A = (n) => Math.round(Math.random() * (n.length - 1)), N = (n) => (2 * Math.random() - 1) * n, B = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
   chooseRandom: v,
   chooseRandomIndex: A,
-  random: g,
+  random: b,
   uniformRandomWeight: N
-}, Symbol.toStringTag, { value: "Module" })), k = (n, e, t, o) => {
-  const i = {};
-  for (const c of t)
-    i[c.connection.toString()] = c.weight;
-  const { inputToOutput: s, outputToInput: l } = I(t), r = w(s, l);
-  if (r.length === 0)
+}, Symbol.toStringTag, { value: "Module" })), L = (n, e, t, o) => {
+  const s = {};
+  for (const a of t)
+    s[a.connection.toString()] = a.weight;
+  const { inputToOutput: i, outputToInput: r } = w(t), l = I(i, r);
+  if (l.length === 0)
     throw new Error(
       "Received an unexpected graph structure, make sure the ANN is configured correctly."
     );
-  return { process: (c) => {
-    if (c.length !== n)
+  return { process: (a) => {
+    if (a.length !== n)
       throw new Error(
-        `Received inputs of length ${c.length}, but expected length ${n}`
+        `Received inputs of length ${a.length}, but expected length ${n}`
       );
-    const u = Array(t.length).fill(0);
-    for (const a of r)
-      if (a < n)
-        u[a] = c[a];
+    const d = Array(t.length).fill(0);
+    for (const c of l)
+      if (c < n)
+        d[c] = a[c];
       else {
-        let m = 0;
-        for (const p of l[a])
-          m += i[[p, a].toString()] * u[p];
-        u[a] = o(m);
+        let g = 0;
+        for (const f of r[c])
+          g += s[[f, c].toString()] * d[f];
+        d[c] = o(g);
       }
-    const d = Array(e).fill(0);
-    for (let a = 0; a < u.length; a++)
-      r[a] >= n && r[a] < n + e && (d[r[a] - n] = u[a]);
-    return d;
+    const p = Array(e).fill(0);
+    for (let c = 0; c < d.length; c++)
+      l[c] >= n && l[c] < n + e && (p[l[c] - n] = d[c]);
+    return p;
   } };
-}, B = (n, e) => n.weight - e.weight, L = (n, e) => {
+}, $ = (n, e) => n.weight - e.weight, W = (n, e) => {
   n.weight += N(e);
-}, $ = (n) => ({ ...n }), W = (n, e) => {
+}, D = (n) => ({ ...n }), V = (n, e) => {
   const t = (n.weight + e.weight) / 2;
   return { ...n, weight: t };
-}, D = (n, e) => ({ ...n, weight: N(e) }), V = (n) => ({ ...n, weight: 1 }), q = (n, e) => ({ ...n, weight: e.weight }), H = {
+}, q = (n, e) => ({ ...n, weight: N(e) }), H = (n) => ({ ...n, weight: 1 }), J = (n, e) => ({ ...n, weight: e.weight }), K = {
   // Configuration options for the artificial neural network
   weightMutationRange: 1,
   // The maximum magnitude of a mutation that changes the weight of a connection
   activation: "posAndNegSigmoid"
-}, _ = (n = {}) => {
-  const e = { ...H, ...n };
+}, M = (n = {}) => {
+  const e = { ...K, ...n };
   return {
-    createNetwork: (t, o, i) => k(
+    createNetwork: (t, o, s) => L(
       t,
       o,
-      i,
+      s,
       C[e.activation]
     ),
-    calculateGeneDistance: B,
-    mutateGeneWeight: (t) => L(t, e.weightMutationRange),
-    cloneGene: $,
-    averageGenes: W,
-    configureRandomGene: (t) => D(t, e.weightMutationRange),
-    configureNewGene: V,
-    configureCloneGene: q
+    calculateGeneDistance: $,
+    mutateGeneWeight: (t) => W(t, e.weightMutationRange),
+    cloneGene: D,
+    averageGenes: V,
+    configureRandomGene: (t) => q(t, e.weightMutationRange),
+    configureNewGene: H,
+    configureCloneGene: J
   };
-}, O = (n) => ({ handleInitialPopulation: (o) => n.forEach((i) => {
-  var s;
-  return (s = i.handleInitialPopulation) == null ? void 0 : s.call(i, o);
-}), handleEvolve: (o) => n.forEach((i) => {
-  var s;
-  return (s = i.handleEvolve) == null ? void 0 : s.call(i, o);
-}) }), j = () => ({ handleInitialPopulation: (t) => {
+}, O = (n) => ({ handleInitialPopulation: (o) => n.forEach((s) => {
+  var i;
+  return (i = s.handleInitialPopulation) == null ? void 0 : i.call(s, o);
+}), handleEvolve: (o) => n.forEach((s) => {
+  var i;
+  return (i = s.handleEvolve) == null ? void 0 : i.call(s, o);
+}) }), F = () => ({ handleInitialPopulation: (t) => {
   console.log("Beginning NEAT"), console.log("______________"), console.log(
     `Initial Population Size: ${t.config.initialPopulationSize}`
   ), console.log("Complete Config: "), console.log(t.config), console.log("");
 }, handleEvolve: (t) => {
   var o;
   t.complete ? console.log(`NEAT completed at generation ${t.generation}:`) : console.log(`Results of generation ${t.generation}:`), console.log(`Population Size: ${t.population.length}`), console.log(`Number of Species: ${t.species.length}`), console.log(`Max Fitness: ${(o = t.bestGenomes) == null ? void 0 : o[0].fitness}`), t.complete && (console.log("Best Genomes: "), console.log(t.bestGenomes)), console.log("");
-} }), ie = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
+} }), re = /* @__PURE__ */ Object.freeze(/* @__PURE__ */ Object.defineProperty({
   __proto__: null,
-  ANNPlugin: _,
+  ANNPlugin: M,
   Activation: C,
-  ConsoleLogger: j,
+  ConsoleLogger: F,
   LoggingManager: O,
-  createAdjacencyList: I,
-  helpers: T,
-  topologicalSort: w
-}, Symbol.toStringTag, { value: "Module" })), J = {
-  initialPopulationSize: 150,
+  createAdjacencyList: w,
+  helpers: B,
+  topologicalSort: I
+}, Symbol.toStringTag, { value: "Module" })), Q = {
+  initialPopulationSize: 50,
   // Number of networks in the population
+  targetSpecies: 10,
+  // Desired number of species to maintain
   maxGenerations: 100,
   // Stopping point for evolution
   maximumStagnation: 15,
   // Maximum number of generations a species is allowed to stay the same fitness before it is removed
-  excessCoefficient: 1,
+  excessCoefficient: 2,
   // Coefficient representing how important excess genes are in measuring compatibility
-  disjointCoefficient: 1,
+  disjointCoefficient: 2,
   // Coefficient for disjoint genes
-  weightDifferenceCoefficient: 0.4,
+  weightDifferenceCoefficient: 1,
   // Coefficient for average weight difference (highly recommended for tuning)
-  compatibilityThreshold: 3,
+  compatibilityThreshold: 6,
   // Threshold for speciation (highly recommended for tuning)
+  compatibilityModifier: 0.3,
+  // Rate to change the compatibility threshold at when target species count is not met
   survivalThreshold: 0.2,
   // Percentage of each species allowed to reproduce
   mutateOnlyProbability: 0.25,
@@ -147,34 +151,34 @@ const I = (n) => {
   fitnessSort: "max",
   largeNetworkSize: 20,
   // A network with this many genes is considered to be large
-  minimumSpeciesSize: 2,
+  minimumSpeciesSize: 1,
   // The minimum number of offspring a species can have
   hallOfFameSize: 10,
   // The number of top-performing individuals to store
-  inputSize: 3,
+  inputSize: 1,
   // The number of inputs to each neural network
-  outputSize: 2,
+  outputSize: 1,
   // The number of outputs of each neural network
   // Plugin for the specific type of neural network (ANN, RNN, etc)
-  nnPlugin: _(),
+  nnPlugin: M(),
   // Plugins for logging data
-  loggingPlugins: [j()]
-}, K = (n, e) => {
+  loggingPlugins: [F()]
+}, U = (n, e) => {
   const t = [];
-  for (let i = 0; i < e.inputSize; i++)
-    for (let s = 0; s < e.outputSize; s++) {
-      const l = [i, e.inputSize + s], r = n.getInnovation(l);
+  for (let s = 0; s < e.inputSize; s++)
+    for (let i = 0; i < e.outputSize; i++) {
+      const r = [s, e.inputSize + i], l = n.getInnovation(r);
       t.push(
         e.nnPlugin.configureRandomGene({
-          connection: l,
+          connection: r,
           enabled: !0,
-          innovationNumber: r
+          innovationNumber: l
         })
       );
     }
   const o = e.inputSize + e.outputSize - 1;
-  return y(t, o, e);
-}, y = (n, e, t) => {
+  return x(t, o, e);
+}, x = (n, e, t) => {
   if (t.inputSize < 1 || t.outputSize < 1)
     throw new Error(
       "Invalid neural network input or output size. Verify that there are at least 1 of each."
@@ -191,265 +195,277 @@ const I = (n) => {
     process: o.process,
     maxGeneIndex: e
   };
-}, Q = (n, e, t) => {
+}, X = (n, e, t) => {
   e.genes.length > n.genes.length && ([n, e] = [e, n]);
-  const o = n.genes.length, i = e.genes.length, s = o - i;
-  let l = 0, r = 0, h = 0, c = 0, u = 0;
-  const d = o > t.largeNetworkSize ? o : 1;
-  for (; c < o && u < i; )
-    n.genes[c].innovationNumber === e.genes[u].innovationNumber ? (r += t.nnPlugin.calculateGeneDistance(
-      n.genes[c++],
-      n.genes[u++]
-    ), h++) : n.genes[c].innovationNumber > e.genes[u].innovationNumber ? (l++, u++) : n.genes[c].innovationNumber < e.genes[u].innovationNumber && (l++, c++);
-  return t.excessCoefficient * s / d + t.disjointCoefficient * l / d + t.weightDifferenceCoefficient * (r / h);
+  const o = n.genes.length, s = e.genes.length, i = o - s;
+  let r = 0, l = 0, u = 0, a = 0, d = 0;
+  const p = o > t.largeNetworkSize ? o : 1;
+  for (; a < o && d < s; )
+    n.genes[a].innovationNumber === e.genes[d].innovationNumber ? (l += t.nnPlugin.calculateGeneDistance(
+      n.genes[a++],
+      n.genes[d++]
+    ), u++) : n.genes[a].innovationNumber > e.genes[d].innovationNumber ? (r++, d++) : n.genes[a].innovationNumber < e.genes[d].innovationNumber && (r++, a++);
+  return t.excessCoefficient * i / p + t.disjointCoefficient * r / p + t.weightDifferenceCoefficient * (l / u);
 }, S = (n, e, t) => {
   const o = e.adjustedFitness === n.adjustedFitness;
   e.adjustedFitness > n.adjustedFitness && ([n, e] = [e, n]);
-  const i = o ? Math.max(n.maxGeneIndex, e.maxGeneIndex) : n.maxGeneIndex, s = n.genes.length, l = e.genes.length, r = [];
-  let h = 0, c = 0;
-  for (; h < s; ) {
-    const u = n.genes[h], d = e.genes[c];
-    if (c >= l) {
-      const a = t.nnPlugin.cloneGene(u);
-      g(t.reenableConnectionProbability) && (a.enabled = !0), r.push(), h++;
-    } else if (u.innovationNumber === d.innovationNumber) {
-      let a;
-      g(t.mateByChoosingProbability) ? a = t.nnPlugin.cloneGene(
-        Math.random() < 0.5 ? u : d
-      ) : a = t.nnPlugin.averageGenes(
-        u,
-        d
-      ), g(t.reenableConnectionProbability) && (a.enabled = !0), r.push(a), h++, c++;
-    } else if (u.innovationNumber > d.innovationNumber) {
-      const a = t.nnPlugin.cloneGene(u);
-      g(t.reenableConnectionProbability) && (a.enabled = !0), r.push(a), h++, c++;
-    } else if (u.innovationNumber < d.innovationNumber) {
+  const s = o ? Math.max(n.maxGeneIndex, e.maxGeneIndex) : n.maxGeneIndex, i = n.genes.length, r = e.genes.length, l = [];
+  let u = 0, a = 0;
+  for (; u < i; ) {
+    const d = n.genes[u], p = e.genes[a];
+    if (a >= r) {
+      const c = t.nnPlugin.cloneGene(d);
+      b(t.reenableConnectionProbability) && (c.enabled = !0), l.push(), u++;
+    } else if (d.innovationNumber === p.innovationNumber) {
+      let c;
+      b(t.mateByChoosingProbability) ? c = t.nnPlugin.cloneGene(
+        Math.random() < 0.5 ? d : p
+      ) : c = t.nnPlugin.averageGenes(
+        d,
+        p
+      ), b(t.reenableConnectionProbability) && (c.enabled = !0), l.push(c), u++, a++;
+    } else if (d.innovationNumber > p.innovationNumber) {
+      const c = t.nnPlugin.cloneGene(d);
+      b(t.reenableConnectionProbability) && (c.enabled = !0), l.push(c), u++, a++;
+    } else if (d.innovationNumber < p.innovationNumber) {
       if (o) {
-        const a = t.nnPlugin.cloneGene(
-          d
+        const c = t.nnPlugin.cloneGene(
+          p
         );
-        g(t.reenableConnectionProbability) && (a.enabled = !0), r.push(a), c++;
+        b(t.reenableConnectionProbability) && (c.enabled = !0), l.push(c), a++;
       }
-      h++;
+      u++;
     }
   }
-  return { newGenes: r, maxGeneIndex: i };
-}, U = (n, e, t, o, i, s, l) => {
-  const r = Array.from(
+  return { newGenes: l, maxGeneIndex: s };
+}, Y = (n, e, t, o, s, i, r) => {
+  const l = Array.from(
     { length: o + 1 },
-    (b, x) => x
-  ), h = r.slice();
-  h.splice(i, s);
-  let c = v(h);
-  const u = r.slice(i);
-  let d = v(u);
-  if (c === d)
+    (h, y) => y
+  ), u = l.slice();
+  u.splice(s, i);
+  let a = v(u);
+  const d = l.slice(s);
+  let p = v(d);
+  if (a === p)
     return;
-  const a = t.findIndex((b) => b === c), m = t.findIndex(
-    (b) => b === d
+  const c = t.findIndex((h) => h === a), g = t.findIndex(
+    (h) => h === p
   );
-  a > m && ([c, d] = [d, c]);
-  const p = n.find(
-    (b) => b.connection[0] === c && b.connection[1] === d
+  c > g && ([a, p] = [p, a]);
+  const f = n.find(
+    (h) => h.connection[0] === a && h.connection[1] === p
   );
-  if (p !== void 0) {
-    p.enabled = !0;
+  if (f !== void 0) {
+    f.enabled = !0;
     return;
   }
-  const f = [c, d], G = e.getInnovation(f);
+  const G = [a, p], m = e.getInnovation(G);
   n.push(
-    l.nnPlugin.configureNewGene({
-      connection: f,
+    r.nnPlugin.configureNewGene({
+      connection: G,
       enabled: !0,
-      innovationNumber: G
+      innovationNumber: m
     })
   );
-}, X = (n, e, t, o) => {
-  const i = v(n);
-  i.enabled = !1;
-  const s = t + 1, l = [
-    i.connection[0],
-    s
-  ], r = [
-    s,
-    i.connection[1]
+}, Z = (n, e, t, o) => {
+  const s = v(n);
+  s.enabled = !1;
+  const i = t + 1, r = [
+    s.connection[0],
+    i
+  ], l = [
+    i,
+    s.connection[1]
   ];
   return n.push(
     o.nnPlugin.configureNewGene({
-      connection: l,
+      connection: r,
       enabled: !0,
-      innovationNumber: e.getInnovation(l)
+      innovationNumber: e.getInnovation(r)
     })
   ), n.push(
     o.nnPlugin.configureCloneGene(
       {
-        connection: r,
+        connection: l,
         enabled: !0,
-        innovationNumber: e.getInnovation(r)
+        innovationNumber: e.getInnovation(l)
       },
-      i
+      s
     )
-  ), s;
-}, Y = (n, e, t) => {
+  ), i;
+}, ee = (n, e, t, o) => {
   for (let i = 0; i < e.length; i++)
-    e[i] = e[i].slice(0, 1);
-  const o = e.map(() => ({
-    distance: 1 / 0,
-    i: 0
-  }));
+    e[i].population = [];
   for (const i of n) {
-    let s = !1;
-    for (const [l, r] of e.entries()) {
-      const h = Q(
-        r[0],
+    let r = !1;
+    for (const l of e)
+      if (X(
+        l.representative,
         i,
         t
-      );
-      h < t.compatibilityThreshold && !s && (r.push(i), h < o[l].distance && (o[l] = {
-        distance: h,
-        i: r.length - 1
-      }), s = !0);
-    }
-    s || (e.push([i]), o.push({
-      distance: 1 / 0,
-      i: 0
-    }));
+      ) < t.compatibilityThreshold && !r) {
+        l.population.push(i), i.fitness > l.recordFitness && (l.recordFitness = i.fitness, l.recordGeneration = o), r = !0;
+        break;
+      }
+    r || e.push(ne(i, o));
   }
-  for (const [i, s] of e.entries())
-    s[0] = s.splice(o[i].i, 1)[0];
-}, Z = (n, e, t, o) => {
-  Y(n, e, o), ee(e);
-  const i = ne(n, e), s = [];
-  for (const [l, r] of e.entries()) {
-    const h = r.sort(
-      (d, a) => a.adjustedFitness - d.adjustedFitness
+  return e.filter((i) => i.population.length > 0);
+}, ne = (n, e) => ({
+  population: [n],
+  recordFitness: n.fitness,
+  recordGeneration: e,
+  createdGeneration: e,
+  representative: n
+}), te = (n, e, t, o, s) => {
+  const i = ee(
+    n,
+    e,
+    o,
+    s
+  );
+  se(i, o), oe(i);
+  const r = ie(
+    n,
+    i,
+    o,
+    s
+  ), l = [];
+  for (const [u, a] of i.entries()) {
+    const d = a.population.sort(
+      (g, f) => f.adjustedFitness - g.adjustedFitness
       // This currently assumes positive fitness is ideal
-    ), c = h.slice(
+    ), p = d.slice(
       0,
       Math.max(
-        r.length * o.survivalThreshold,
+        a.population.length * o.survivalThreshold,
         o.minimumSpeciesSize
       )
-    ), u = h[0];
-    s.push(
-      y(
-        structuredClone(u.genes),
-        u.maxGeneIndex,
+    ), c = d[0];
+    l.push(
+      x(
+        structuredClone(c.genes),
+        c.maxGeneIndex,
         o
       )
     );
-    for (let d = 0; d < Math.max(i[l] - 1, o.minimumSpeciesSize); d++) {
-      const a = v(c);
-      let m = v(c);
-      g(o.interspeciesMatingRate) && (m = v(v(e)));
-      let p, f;
-      if (g(o.mateOnlyProbability)) {
-        const G = S(a, m, o);
-        p = G.newGenes, f = G.maxGeneIndex;
+    for (let g = 0; g < Math.max(r[u] - 1, o.minimumSpeciesSize); g++) {
+      const f = v(p);
+      let G = v(p);
+      b(o.interspeciesMatingRate) && (G = v(v(i).population));
+      let m, h;
+      if (b(o.mateOnlyProbability)) {
+        const y = S(f, G, o);
+        m = y.newGenes, h = y.maxGeneIndex;
       } else {
-        if (g(o.mutateOnlyProbability))
-          p = structuredClone(a.genes), f = a.maxGeneIndex;
+        if (b(o.mutateOnlyProbability))
+          m = structuredClone(f.genes), h = f.maxGeneIndex;
         else {
-          const P = S(a, m, o);
-          p = P.newGenes, f = P.maxGeneIndex;
+          const P = S(f, G, o);
+          m = P.newGenes, h = P.maxGeneIndex;
         }
-        const { inputToOutput: G, outputToInput: b } = I(p), x = w(G, b);
-        g(o.addLinkProbability) ? U(
-          p,
+        const { inputToOutput: y, outputToInput: _ } = w(m), j = I(y, _);
+        b(o.addLinkProbability) ? Y(
+          m,
           t,
-          x,
-          f,
+          j,
+          h,
           o.inputSize,
           o.outputSize,
           o
-        ) : g(o.addNodeProbability) && (f = X(
-          p,
+        ) : b(o.addNodeProbability) && (h = Z(
+          m,
           t,
-          f,
+          h,
           o
         ));
-        for (const P of p)
-          g(o.mutateWeightProbability) && o.nnPlugin.mutateGeneWeight(P);
+        for (const P of m)
+          b(o.mutateWeightProbability) && o.nnPlugin.mutateGeneWeight(P);
       }
-      s.push(
-        y(p, f, o)
+      l.push(
+        x(m, h, o)
       );
     }
   }
-  return s;
-}, ee = (n) => {
+  return { nextPopulation: l, nextSpecies: i };
+}, oe = (n) => {
   for (const e of n)
-    for (const t of e)
-      t.adjustedFitness = t.fitness / e.length;
-}, ne = (n, e) => {
-  const t = e.map((i) => i.reduce((s, l) => s + l.adjustedFitness, 0) / i.length), o = t.reduce(
-    (i, s) => i + s,
+    for (const t of e.population)
+      t.adjustedFitness = t.fitness / e.population.length;
+}, ie = (n, e, t, o) => {
+  const s = e.map((l) => l.population.reduce((u, a) => u + a.adjustedFitness, 0) / l.population.length), i = s.reduce(
+    (l, u) => l + u,
     0
   );
-  return t.map(
-    (i) => Math.round(i / o * n.length)
-  );
-}, te = (n) => {
+  return s.map(
+    (l) => Math.round(l / i * n.length)
+  ).map((l, u) => o - e[u].recordGeneration >= t.maximumStagnation ? Math.floor(l / 2) : l);
+}, se = (n, e) => {
+  n.length < e.targetSpecies ? e.compatibilityThreshold -= e.compatibilityModifier : n.length > e.targetSpecies && (e.compatibilityThreshold += e.compatibilityModifier), e.compatibilityThreshold < e.compatibilityModifier && (e.compatibilityThreshold = e.compatibilityModifier);
+}, le = (n) => {
   const e = Array(n);
   let t = -1 / 0;
-  return { tryAdding: (s) => {
-    var r;
-    if (s.fitness < t)
+  return { tryAdding: (i) => {
+    var l;
+    if (i.fitness < t)
       return;
-    const l = e.findIndex(
-      (h) => h && h.fitness <= s.fitness
+    const r = e.findIndex(
+      (u) => u && u.fitness <= i.fitness
     );
-    l === -1 ? e.unshift(s) : l === e.length - 1 ? e.push(s) : e.splice(l, 0, s), e.length > n && e.pop(), t = ((r = e.at(-1)) == null ? void 0 : r.fitness) ?? -1 / 0;
+    r === -1 ? e.unshift(i) : r === e.length - 1 ? e.push(i) : e.splice(r, 0, i), e.length > n && e.pop(), t = ((l = e.at(-1)) == null ? void 0 : l.fitness) ?? -1 / 0;
   }, getBestGenomes: () => e };
-}, oe = () => {
+}, ae = () => {
   let n = 0;
-  const e = {}, t = (i) => {
-    const s = n++;
-    return e[i.toString()] = s, s;
+  const e = {}, t = (s) => {
+    const i = n++;
+    return e[s.toString()] = i, i;
   };
-  return { addInnovation: t, getInnovation: (i) => e[i.toString()] ?? t(i) };
-}, se = (n = {}) => {
-  var m;
-  const e = { ...J, ...n }, t = O(e.loggingPlugins);
-  let o = Array(e.initialPopulationSize);
-  const i = [], s = oe(), l = te(e.hallOfFameSize);
-  for (let p = 0; p < e.initialPopulationSize; p++)
-    o[p] = K(s, e);
-  (m = t.handleInitialPopulation) == null || m.call(t, { population: o, config: e });
-  const r = () => o, h = () => o.entries();
-  let c = 0;
-  const u = () => c, d = () => c >= e.maxGenerations;
+  return { addInnovation: t, getInnovation: (s) => e[s.toString()] ?? t(s) };
+}, ce = (n = {}) => {
+  var g;
+  const e = { ...Q, ...n }, t = O(e.loggingPlugins);
+  let o = Array(e.initialPopulationSize), s = [];
+  const i = ae(), r = le(e.hallOfFameSize);
+  for (let f = 0; f < e.initialPopulationSize; f++)
+    o[f] = U(i, e);
+  (g = t.handleInitialPopulation) == null || g.call(t, { population: o, config: e });
+  const l = () => o, u = () => o.entries();
+  let a = 0;
+  const d = () => a, p = () => a >= e.maxGenerations;
   return {
-    getPopulation: r,
-    getPopulationIndexed: h,
-    getCurrentGeneration: u,
-    complete: d,
+    getPopulation: l,
+    getPopulationIndexed: u,
+    getCurrentGeneration: d,
+    complete: p,
     evolve: () => {
-      var p;
+      var m;
       switch (e.fitnessSort) {
         case "max":
           break;
         case "min":
-          o.forEach((f) => f.fitness *= -1);
+          o.forEach((h) => h.fitness *= -1);
       }
-      o.forEach((f) => l.tryAdding(f)), o = Z(
+      o.forEach((h) => r.tryAdding(h));
+      const { nextPopulation: f, nextSpecies: G } = te(
         o,
-        i,
         s,
-        e
-      ), c++, (p = t.handleEvolve) == null || p.call(t, {
+        i,
+        e,
+        a
+      );
+      o = f, s = G, a++, (m = t.handleEvolve) == null || m.call(t, {
         population: o,
         config: e,
-        generation: c,
-        species: i,
-        bestGenomes: l.getBestGenomes(),
-        complete: d()
+        generation: a,
+        species: s,
+        bestGenomes: r.getBestGenomes(),
+        complete: p()
       });
     },
-    getBestGenomes: l.getBestGenomes
+    getBestGenomes: r.getBestGenomes
   };
 };
 export {
-  se as TinyNEAT,
-  ie as plugins
+  ce as TinyNEAT,
+  re as plugins
 };
