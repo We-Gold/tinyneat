@@ -169,7 +169,8 @@ export class Car {
 		// Reward the individual based on the number of black pixels it can see
 		const reward =
 			this.inputs.reduce((acc, curr) => (curr === 1 ? acc + 1 : acc), 0) /
-			this.inputs.length + this.speed / (2 * CAR_SPEED)
+				this.inputs.length +
+			this.speed / (2 * CAR_SPEED)
 
 		return reward
 	}
